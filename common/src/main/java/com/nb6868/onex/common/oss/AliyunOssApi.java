@@ -14,6 +14,7 @@ import cn.hutool.core.text.StrJoiner;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.*;
 import cn.hutool.json.JSONException;
@@ -23,6 +24,7 @@ import com.nb6868.onex.common.pojo.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -108,7 +110,7 @@ public class AliyunOssApi {
         HttpRequest request = HttpRequest.of(url)
                 .method(Method.GET)
                 .header("x-oss-content-sha256", "UNSIGNED-PAYLOAD")
-                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance("yyyyMMdd'T'HHmmss'Z'", TimeZone.getTimeZone("GMT"))));
+                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance(ISO8601_DATETIME_FORMAT, TimeZone.getTimeZone("GMT"))));
         ObjUtil.defaultIfNull(objectMetadataMap, new HashMap<String, Object>()).forEach((key, value) -> {
             // 从传参获取header值
             request.header(key, String.valueOf(value));
@@ -159,7 +161,7 @@ public class AliyunOssApi {
         HttpRequest request = HttpRequest.of(url)
                 .method(Method.PUT)
                 .header("x-oss-content-sha256", "UNSIGNED-PAYLOAD")
-                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance("yyyyMMdd'T'HHmmss'Z'", TimeZone.getTimeZone("GMT"))))
+                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance(ISO8601_DATETIME_FORMAT, TimeZone.getTimeZone("GMT"))))
                 .body(IoUtil.readBytes(inputStream));
         ObjUtil.defaultIfNull(objectMetadataMap, new HashMap<String, Object>()).forEach((key, value) -> {
             // 从传参获取header值
@@ -222,7 +224,7 @@ public class AliyunOssApi {
         HttpRequest request = HttpRequest.of(url)
                 .method(Method.HEAD)
                 .header("x-oss-content-sha256", "UNSIGNED-PAYLOAD")
-                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance("yyyyMMdd'T'HHmmss'Z'", TimeZone.getTimeZone("GMT"))));
+                .header("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance(ISO8601_DATETIME_FORMAT, TimeZone.getTimeZone("GMT"))));
         ObjUtil.defaultIfNull(objectMetadataMap, new HashMap<String, Object>()).forEach((key, value) -> {
             // 从传参获取header值
             request.header(key, String.valueOf(value));
@@ -300,7 +302,7 @@ public class AliyunOssApi {
                 // HTTP Verb
                 request.getMethod().name() + StrUtil.LF +
                         // Canonical URI
-                        StrUtil.SLASH + bucketName + requestUrl.getPathStr() + StrUtil.LF;
+                        StrUtil.SLASH + bucketName + urlEncode(URLUtil.decode(requestUrl.getPathStr()), true) + StrUtil.LF;
         // Canonical Query String，针对QueryString排序UriEncode后的字符串，单独对key和value进行编码
         canonicalRequest += getSortedQueryString(requestUrl.getQuery() == null ? null : requestUrl.getQuery().getQueryMap());
         canonicalRequest += StrUtil.LF;
@@ -399,6 +401,20 @@ public class AliyunOssApi {
      */
     private static byte[] hmacSha256(byte[] key, String data) {
         return SecureUtil.hmacSha256(key).digest(data);
+    }
+
+    /**
+     * 阿里云的弱智urlEncode
+     */
+    public static String urlEncode(String value, boolean ignoreSlashes) {
+        String encoded = URLEncoder.encode(value, Charset.defaultCharset());
+        encoded = StrUtil.replace(encoded, "+", "%20");
+        encoded = StrUtil.replace(encoded, "*", "%2A");
+        encoded = StrUtil.replace(encoded, "%7E", "~");
+        if (ignoreSlashes) {
+            encoded = StrUtil.replace(encoded, "%2F", "/");
+        }
+        return encoded;
     }
 
 }
