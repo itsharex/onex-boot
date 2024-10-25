@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -49,34 +50,33 @@ public class ShiroJwtRealm extends BaseShiroRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(@NotNull AuthenticationToken authenticationToken) throws AuthenticationException {
         // AuthenticationToken包含身份信息和认证信息，在Filter中塞入
         String token = getTokenFromAuthenticationToken(authenticationToken);
-        Assert.isTrue(StrUtil.isBlank(token), ()-> new AuthenticationException("请先登录..."));
+        Assert.isTrue(StrUtil.isNotBlank(token), ()-> new AuthenticationException("请先登录..."));
         // 尝试解析为jwt
         JWT jwt = JwtUtils.parseToken(token);
-        Assert.isTrue(jwt == null || jwt.getPayload() == null || jwt.getPayload().getClaimsJson() == null, ()-> new AuthenticationException("登录信息错误,请重新登录..."));
+        Assert.isTrue(ObjUtil.isNotNull(jwt) && ObjUtil.isNotNull(jwt.getPayload()) && ObjUtil.isNotNull(jwt.getPayload().getClaimsJson()), ()-> new AuthenticationException("登录信息错误,请重新登录..."));
         // 获取jwt中的登录配置
         String loginType = jwt.getPayload().getClaimsJson().getStr(authProps.getTokenJwtKey());
-        Assert.isTrue(StrUtil.isBlank(loginType), ()-> new AuthenticationException("登录信息缺少key,请重新登录..."));
+        Assert.isTrue(StrUtil.isNotBlank(loginType), ()-> new AuthenticationException("登录信息缺少key,请重新登录..."));
         JSONObject loginConfig = paramsService.getSystemPropsJson(loginType);
-        Assert.isNull(loginConfig, ()-> new AuthenticationException("缺少登录信息配置,请重新登录..."));
+        Assert.notNull(loginConfig, ()-> new AuthenticationException("缺少登录信息配置,请重新登录..."));
         // 获取用户id
         Long userId;
         if ("db".equalsIgnoreCase(loginConfig.getStr(AuthConst.TOKEN_STORE_TYPE_KEY, AuthConst.TOKEN_STORE_TYPE_VALUE))) {
             // token存在数据库中
             Map<String, Object> tokenEntity = shiroDao.getUserTokenByToken(token);
-            Assert.isNull(tokenEntity, ()-> new AuthenticationException("登录信息已失效,请重新登录..."));
             userId = MapUtil.getLong(tokenEntity, "user_id");
         } else {
             // token没有持久化，直接用jwt验证
-            Assert.isFalse(JwtUtils.verifyKeyAndExp(jwt, loginConfig.getStr(AuthConst.TOKEN_JWT_KEY_KEY, AuthConst.TOKEN_JWT_KEY_VALUE)), ()-> new AuthenticationException("登录信息已失效,请重新登录..."));
+            Assert.isTrue(JwtUtils.verifyKeyAndExp(jwt, loginConfig.getStr(AuthConst.TOKEN_JWT_KEY_KEY, AuthConst.TOKEN_JWT_KEY_VALUE)), ()-> new AuthenticationException("登录信息已失效,请重新登录..."));
             userId = NumberUtil.parseLong(jwt.getPayload().getClaimsJson().getStr("id"));
         }
-        Assert.isNull(userId, ()-> new AuthenticationException("缺少登录用户信息,请重新登录..."));
+        Assert.notNull(userId, ()-> new AuthenticationException("缺少登录用户信息,请重新登录..."));
         // 验证用户是否还存在
         Map<String, Object> userEntity = shiroDao.getUserById(userId);
         // 账号不存在
-        Assert.isNull(userId, ()-> new AuthenticationException("缺少登录账号信息,请重新登录..."));
+        Assert.notNull(userEntity, ()-> new AuthenticationException("缺少登录账号信息,请重新登录..."));
         // 账号锁定
-        Assert.isFalse(MapUtil.getInt(userEntity, "state", -1) == ShiroConst.USER_STATE_ENABLED, ()-> new AuthenticationException("账号已锁定,请联系管理员..."));
+        Assert.isTrue(MapUtil.getInt(userEntity, "state", -1) == ShiroConst.USER_STATE_ENABLED, ()-> new AuthenticationException("账号已锁定,请联系管理员..."));
         // 转换成UserDetail对象,setIgnoreError保证过程不出错，但可能会吞掉异常问题
         ShiroUser shiroUser = BeanUtil.toBean(userEntity, ShiroUser.class, CopyOptions.create()
                 .setAutoTransCamelCase(true)

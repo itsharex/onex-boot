@@ -38,9 +38,7 @@ public abstract class BaseShiroRealm extends AuthorizingRealm {
             token = authenticationToken.getCredentials().toString();
         }
         // 适配token中带有Bearer的情况
-        token = StrUtil.removePrefix(token, "Bearer ");
-        token = StrUtil.removePrefix(token, "bearer ");
-        return token;
+        return StrUtil.removePrefixIgnoreCase(token, "Bearer ");
     }
 
     /**

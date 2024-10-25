@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [4.1.89] 2024.10.25
+- new: upgrade aliyun oss api support
+- enhance: change login 401 error message
+- upgrade: upgrade mybatis-plus to 3.5.9, since this version need add jsqlparser 
+
 ## [4.1.64] 2024.09.13
 - upgrade: upgrade aws-s3 to 2.27.24
 - upgrade: upgrade easyexcel to 4.0.3

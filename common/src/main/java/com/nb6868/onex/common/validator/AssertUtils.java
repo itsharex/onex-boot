@@ -2,19 +2,16 @@ package com.nb6868.onex.common.validator;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import com.nb6868.onex.common.util.MessageUtils;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.exception.OnexException;
-import org.springframework.util.ObjectUtils;
-
-import java.util.function.Supplier;
+import com.nb6868.onex.common.util.MessageUtils;
 
 
 /**
  * 校验工具类
  * 参考 cn.hutool.lang.Assert
  *
- * 注意：区别于Assert，是符合规则才抛出异常
+ * *注意*: 区别于Assert，是符合规则才抛出异常
  *
  * @author Charles zhangchaoxu@gmail.com
  */
