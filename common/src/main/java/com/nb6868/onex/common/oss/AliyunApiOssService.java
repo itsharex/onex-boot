@@ -91,7 +91,7 @@ public class AliyunApiOssService extends AbstractOssService {
         result.set("form", form);
         if (StrUtil.isNotBlank(objectKey)) {
             // 限定key
-            form.set("url", this.config.getDomain() + objectKey);
+            result.set("url", this.config.getDomain() + objectKey);
         }
         // result.set("key", objectKey);
         // result.set("file", file);
