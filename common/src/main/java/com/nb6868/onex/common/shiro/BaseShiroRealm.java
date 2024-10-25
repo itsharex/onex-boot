@@ -29,6 +29,21 @@ public abstract class BaseShiroRealm extends AuthorizingRealm {
     }
 
     /**
+     * 从AuthenticationToken中获得token字符串
+     */
+    protected String getTokenFromAuthenticationToken(AuthenticationToken authenticationToken) {
+        // AuthenticationToken包含身份信息和认证信息，在Filter中塞入
+        String token = null;
+        if (null != authenticationToken.getCredentials()) {
+            token = authenticationToken.getCredentials().toString();
+        }
+        // 适配token中带有Bearer的情况
+        token = StrUtil.removePrefix(token, "Bearer ");
+        token = StrUtil.removePrefix(token, "bearer ");
+        return token;
+    }
+
+    /**
      * 授权(验证权限时调用)
      * 验证token不会过这个方法
      * 只有当需要检测用户权限的时候才会调用此方法

@@ -1,11 +1,20 @@
 package com.nb6868.onex.coder.utils;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serial;
+
 /**
  * 自定义异常
  *
  * @author Charles (zhangchoxu@gmail.com)
  */
+@Getter
+@Setter
 public class OnexException extends RuntimeException {
+
+	@Serial
 	private static final long serialVersionUID = 1L;
 
     private String msg;
@@ -32,22 +41,5 @@ public class OnexException extends RuntimeException {
 		this.msg = msg;
 		this.code = code;
 	}
-
-	public String getMsg() {
-		return msg;
-	}
-
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public void setCode(int code) {
-		this.code = code;
-	}
-
 
 }
