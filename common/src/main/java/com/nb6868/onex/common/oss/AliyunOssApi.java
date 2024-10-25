@@ -188,8 +188,7 @@ public class AliyunOssApi {
                             .setMsg("ok")
                             .setData(result);
                 } else {
-                    String xOssErr = httpResponse.header("x-oss-err");
-                    JSONObject result = JSONUtil.xmlToJson(Base64.decodeStr(xOssErr));
+                    JSONObject result = getErrorInfo(httpResponse);
                     apiResult.setSuccess(false)
                             .setCode(JSONUtil.getByPath(result, "Error.Code", ""))
                             .setMsg(JSONUtil.getByPath(result, "Error.Message", ""))
@@ -198,10 +197,13 @@ public class AliyunOssApi {
             });
             return apiResult;
         } catch (HttpException he) {
+            log.error("aliyun oss api putObject http exception", he);
             return apiResult.error(ApiResult.ERROR_CODE_HTTP_EXCEPTION, url + "=>http exception=>" + he.getMessage()).setRetry(true);
         } catch (JSONException je) {
+            log.error("aliyun oss api putObject json exception", je);
             return apiResult.error(ApiResult.ERROR_CODE_JSON_EXCEPTION, url + "=>http exception=>" + je.getMessage()).setRetry(true);
         } catch (Exception e) {
+            log.error("aliyun oss api putObject error", e);
             return apiResult.error(ApiResult.ERROR_CODE_EXCEPTION, url + "=>exception=>" + e.getMessage()).setRetry(true);
         }
     }
@@ -244,8 +246,7 @@ public class AliyunOssApi {
                             .setMsg("ok")
                             .setData(result);
                 } else {
-                    String xOssErr = httpResponse.header("x-oss-err");
-                    JSONObject result = JSONUtil.xmlToJson(Base64.decodeStr(xOssErr));
+                    JSONObject result = getErrorInfo(httpResponse);
                     apiResult.setSuccess(false)
                             .setCode(JSONUtil.getByPath(result, "Error.Code", ""))
                             .setMsg(JSONUtil.getByPath(result, "Error.Message", ""))
@@ -254,10 +255,13 @@ public class AliyunOssApi {
             });
             return apiResult;
         } catch (HttpException he) {
+            log.error("aliyun oss api headObject http exception", he);
             return apiResult.error(ApiResult.ERROR_CODE_HTTP_EXCEPTION, url + "=>http exception=>" + he.getMessage()).setRetry(true);
         } catch (JSONException je) {
+            log.error("aliyun oss api headObject json exception", je);
             return apiResult.error(ApiResult.ERROR_CODE_JSON_EXCEPTION, url + "=>http exception=>" + je.getMessage()).setRetry(true);
         } catch (Exception e) {
+            log.error("aliyun oss api headObject error", e);
             return apiResult.error(ApiResult.ERROR_CODE_EXCEPTION, url + "=>exception=>" + e.getMessage()).setRetry(true);
         }
     }
@@ -343,6 +347,20 @@ public class AliyunOssApi {
     public static String buildAuthorization(Date date, String assessKeyId, String region, List<String> additionalHeaders, String signature) {
         String dateFmt2 = DateUtil.format(date, FastDateFormat.getInstance(ISO8601_DATE_FORMAT, TimeZone.getTimeZone("GMT")));
         return StrUtil.format("{} Credential={}/{}/{}/oss/{},AdditionalHeaders={},Signature={}", OSS4_HMAC_SHA256, assessKeyId, dateFmt2, region, TERMINATOR, StrUtil.join(";", ListUtil.sort(additionalHeaders, String::compareTo)), signature);
+    }
+
+    /**
+     * 解析错误信息
+     *
+     * @param httpResponse 网络响应
+     * @return 错误信息
+     */
+    private static JSONObject getErrorInfo(HttpResponse httpResponse) {
+        // 先从header.x-oss-err获取数据，此部分信息结果base64
+        // 若没获取到，从返回的消息体重获取数据，此部分数据原始xml，不做base64
+        String xOssErr = httpResponse.header("x-oss-err");
+        String xml = StrUtil.isNotBlank(xOssErr) ? Base64.decodeStr(xOssErr) : httpResponse.body();
+        return JSONUtil.xmlToJson(xml);
     }
 
     /**
