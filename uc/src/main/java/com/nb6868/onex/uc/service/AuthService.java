@@ -43,10 +43,10 @@ public class AuthService {
         // 获得用户
         UserEntity user = userService.getByUsername(form.getTenantCode(), form.getUsername());
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
-        // 判断用户状态
-        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
         // 验证密码
         boolean passwordVerify = PasswordUtils.verify(form.getPassword(), user.getPassword());
+        // 判断用户状态
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
         if (!passwordVerify) {
             // 密码错误
             if (loginParams.getBool("passwordErrorLock", false)) {
