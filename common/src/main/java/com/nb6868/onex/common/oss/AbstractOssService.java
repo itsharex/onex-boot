@@ -7,6 +7,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RadixUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -53,7 +54,7 @@ public abstract class AbstractOssService {
             path += StrUtil.SLASH;
         }
         // 构建文件名
-        String newFileName = buildFileName(path, fileName);
+        String newFileName = buildFileName(path, fileName, config.getPathPolicy());
         return path + newFileName;
     }
 
@@ -75,6 +76,14 @@ public abstract class AbstractOssService {
             return StrUtil.reverse(DateUtil.format(DateUtil.date(), DatePattern.SIMPLE_MONTH_PATTERN));
         } else if ("yearReverse".equalsIgnoreCase(pathPolicy)) {
             return StrUtil.reverse(DateUtil.format(DateUtil.date(), DatePattern.NORM_YEAR_PATTERN));
+        } else if ("radixs34".equalsIgnoreCase(pathPolicy)) {
+            return RadixUtil.encode(RadixUtil.RADIXS_34, DateUtil.current());
+        } else if ("radixsShuffle34".equalsIgnoreCase(pathPolicy)) {
+            return RadixUtil.encode(RadixUtil.RADIXS_SHUFFLE_34, DateUtil.current());
+        } else if ("radixs59".equalsIgnoreCase(pathPolicy)) {
+            return RadixUtil.encode(RadixUtil.RADIXS_59, DateUtil.current());
+        } else if ("radixsShuffle59".equalsIgnoreCase(pathPolicy)) {
+            return RadixUtil.encode(RadixUtil.RADIXS_SHUFFLE_59, DateUtil.current());
         }
         return "";
     }
@@ -82,7 +91,7 @@ public abstract class AbstractOssService {
     /**
      * 创建文件名
      */
-    public String buildFileName(String path, String fileName) {
+    public String buildFileName(String path, String fileName, String pathPolicy) {
         // 文件
         String newFileName;
         if (config.getKeepFileName()) {
@@ -92,7 +101,8 @@ public abstract class AbstractOssService {
             String fileMainNameNoSpecChar = StrUtil.removeAll(fileMainName, ' ', '+', '=', '&', '#', '/', '?', '%', '*', ',', '，');
             // 新的文件名
             newFileName = fileMainNameNoSpecChar + (StrUtil.isNotBlank(fileExtName) ? ("." + fileExtName) : "");
-            if (isObjectKeyExisted(config.getBucketName(), path + newFileName).getData()) {
+            // 若路径策略是radixs进制转换，则无需判断重复，通过radixs自身已经做了重复处理，认为毫秒时间内不会有重名文件请求
+            if (!StrUtil.startWith(pathPolicy, "radixs") && isObjectKeyExisted(config.getBucketName(), path + newFileName).getData()) {
                 // 若objectKey已存在,补一个后缀,默认补上后缀后不会再重复
                 newFileName = fileMainNameNoSpecChar + "-" + DateUtil.format(DateUtil.date(), DatePattern.PURE_DATETIME_MS_PATTERN) + (StrUtil.isNotBlank(fileExtName) ? ("." + fileExtName) : "");
             }
