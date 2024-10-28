@@ -17,6 +17,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.*;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -29,7 +30,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * 阿里云OSS接口服务
+ * 阿里云OSS Rest接口
  *
  * <a href="https://help.aliyun.com/zh/oss/developer-reference/overview-24">使用REST API向OSS发起请求</a>
  */
@@ -51,9 +52,9 @@ public class AliyunOssApi {
      * <a href="https://help.aliyun.com/zh/oss/use-cases/uploading-objects-to-oss-directly-from-clients">在客户端直接上传文件到OSS</a>
      * <a href="https://help.aliyun.com/zh/oss/developer-reference/add-signatures-to-urls">在URL中包含V4签名</a>
      *
-     * @param expires 签名URL的有效时长，单位为秒（s）。最小值为1，最大值为 604800
+     * @param expire 签名URL的有效时长，单位为秒（s）。最小值为1，最大值为 604800
      */
-    public static ApiResult<String> getPreSignedUrl(String accessKeyId, String accessKeySecret, String endPoint, String region, String bucketName, String objectKey, Map<String, Object> objectMetadataMap, String method, int expires) {
+    public static ApiResult<String> getPreSignedUrl(String accessKeyId, String accessKeySecret, String endPoint, String region, String bucketName, String objectKey, Map<String, Object> objectMetadataMap, String method, int expire) {
         ApiResult<String> apiResult = ApiResult.of(null);
         if (StrUtil.hasBlank(accessKeyId, accessKeySecret, bucketName, objectKey)) {
             return apiResult.error(ApiResult.ERROR_CODE_PARAMS);
@@ -80,7 +81,7 @@ public class AliyunOssApi {
                 StrUtil.join(";", ListUtil.sort(additionalHeaders, String::compareTo)),
                 accessKeyId, dateFmt2, region, TERMINATOR,
                 dateFmt1,
-                expires,
+                expire,
                 OSS4_HMAC_SHA256
         );
         String url = StrUtil.format("http://{}.{}/{}", bucketName, endPoint, objectKey);
@@ -94,6 +95,53 @@ public class AliyunOssApi {
         }
         String sign = signV4(request, date, bucketName, region, additionalHeaders, accessKeySecret);
         return apiResult.success(URLEncodeUtil.encode(url) + "?" + queryString + "&x-oss-signature=" + sign);
+    }
+
+    /**
+     * 获得预授权PostForm,支持post
+     * 前端调用注意跨域,补充的file需要在参数第最后一个
+     * @return 会返回整个请求的表单
+     */
+    public static ApiResult<JSONObject> getSignedPostForm(String accessKeyId, String accessKeySecret, String endPoint, String region, String bucketName, String objectKey, JSONArray conditions, int expire, String domain) {
+        Date date = DateUtil.date();
+        JSONObject policy = new JSONObject();
+        // 用于指定policy的过期时间，以ISO8601 GMT时间表示
+        policy.set("expiration", DateUtil.format(DateUtil.offsetSecond(date, expire), FastDateFormat.getInstance(AliyunOssApi.ISO8601_DATETIME_MS_FORMAT, TimeZone.getTimeZone("GMT"))));
+        // 指定POST请求表单域的合法值
+        conditions = ObjUtil.defaultIfNull(conditions, new JSONArray());
+        conditions.add(new JSONObject().set("bucket", bucketName));
+        conditions.add(new JSONObject().set("x-oss-signature-version", AliyunOssApi.OSS4_HMAC_SHA256));
+        conditions.add(new JSONObject().set("x-oss-credential", StrUtil.format("{}/{}/{}/oss/aliyun_v4_request", accessKeyId, DateUtil.format(date, FastDateFormat.getInstance(AliyunOssApi.ISO8601_DATE_FORMAT, TimeZone.getTimeZone("GMT"))), region)));
+        conditions.add(new JSONObject().set("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance(AliyunOssApi.ISO8601_DATETIME_FORMAT, TimeZone.getTimeZone("GMT")))));
+        if (StrUtil.isNotBlank(objectKey)) {
+            // 限定key
+            conditions.put(Arrays.asList("eq", "$key", objectKey));
+        }
+        policy.set("conditions", conditions);
+        // 签名
+        String sign = postSignV4(date, region, accessKeySecret, policy);
+        JSONObject result = new JSONObject();
+        // 访问地址
+        result.set("domain", domain);
+        // 不带协议，让前端自己补充协议
+        result.set("host",  StrUtil.format("{}.{}", bucketName, endPoint));
+        // header
+        JSONObject form = new JSONObject();
+        form.set("policy", Base64.encode(policy.toString()));
+        form.set("x-oss-signature-version", AliyunOssApi.OSS4_HMAC_SHA256);
+        form.set("x-oss-credential", StrUtil.format("{}/{}/{}/oss/aliyun_v4_request", accessKeyId, DateUtil.format(date, FastDateFormat.getInstance(AliyunOssApi.ISO8601_DATE_FORMAT, TimeZone.getTimeZone("GMT"))), region));
+        form.set("x-oss-date", DateUtil.format(date, FastDateFormat.getInstance(AliyunOssApi.ISO8601_DATETIME_FORMAT, TimeZone.getTimeZone("GMT"))));
+        form.set("x-oss-signature", sign);
+        if (StrUtil.isNotBlank(objectKey)) {
+            // 限定key
+            form.set("key", objectKey);
+        }
+        result.set("form", form);
+        if (StrUtil.isNotBlank(objectKey)) {
+            // 限定key
+            result.set("url", domain + objectKey);
+        }
+        return new ApiResult<JSONObject>().success(result);
     }
 
     /**
@@ -337,12 +385,12 @@ public class AliyunOssApi {
                         SecureUtil.sha256(canonicalRequest);
 
         // 步骤3：计算Signature。
-        byte[] dateKey = hmacSha256((SECRET_KEY_PREFIX + accessKeySecret).getBytes(), dateFmt2);
-        byte[] dateRegionKey = hmacSha256(dateKey, region);
-        byte[] dateRegionServiceKey = hmacSha256(dateRegionKey, "oss");
-        byte[] signingKey = hmacSha256(dateRegionServiceKey, TERMINATOR);
+        byte[] dateKey = SecureUtil.hmacSha256((SECRET_KEY_PREFIX + accessKeySecret).getBytes()).digest(dateFmt2);
+        byte[] dateRegionKey = SecureUtil.hmacSha256(dateKey).digest(region);
+        byte[] dateRegionServiceKey = SecureUtil.hmacSha256(dateRegionKey).digest("oss");
+        byte[] signingKey = SecureUtil.hmacSha256(dateRegionServiceKey).digest(TERMINATOR);
         // 步骤4：计算Signature。
-        byte[] result = hmacSha256(signingKey, stringToSign);
+        byte[] result = SecureUtil.hmacSha256(signingKey).digest(stringToSign);
         return HexUtil.encodeHexStr(result);
     }
 
