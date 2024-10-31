@@ -92,7 +92,7 @@ public class SmsAliyunMailService extends AbstractMailService {
         paras.put("Signature", sign);
         // 调用接口发送
         try {
-            String url = HttpUtil.urlWithFormUrlEncoded("http://dysmsapi.aliyuncs.com/", paras, Charset.defaultCharset());
+            String url = HttpUtil.urlWithForm("http://dysmsapi.aliyuncs.com/", paras, Charset.defaultCharset(), false);
             String result = HttpUtil.get(url);
             JSONObject resultJson = JSONUtil.parseObj(result);
             mailLog.setResult(result);

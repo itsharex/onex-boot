@@ -63,7 +63,7 @@ public class DingTalkApi {
             return apiResult.error(ApiResult.ERROR_CODE_PARAMS);
         }
         // 将参数拼接到url上
-        url = HttpUtil.urlWithFormUrlEncoded(url, paramMap, Charset.defaultCharset());
+        url = HttpUtil.urlWithForm(url, paramMap, Charset.defaultCharset(), false);
         try {
             HttpRequest request = HttpRequest.get(url);
             log.debug(request.toString());
@@ -138,7 +138,7 @@ public class DingTalkApi {
             return apiResult.error(ApiResult.ERROR_CODE_PARAMS);
         }
         // 将参数拼接到url上
-        url = HttpUtil.urlWithFormUrlEncoded(url, paramMap, Charset.defaultCharset());
+        url = HttpUtil.urlWithForm(url, paramMap, Charset.defaultCharset(), false);
         try {
             HttpRequest request = HttpRequest.post(url);
             if (StrUtil.isNotBlank(accessToken)) {
@@ -250,7 +250,7 @@ public class DingTalkApi {
         // 处理参数
         String timestamp = String.valueOf(System.currentTimeMillis());
         String signature = SignUtils.signToBase64(timestamp, appSecret, "HmacSHA256");
-        String url = HttpUtil.urlWithFormUrlEncoded(BASE_URL + "/sns/getuserinfo_bycode", Dict.create().set("accessKey", appId).set("timestamp", timestamp).set("signature", SignUtils.urlEncode(signature)), Charset.defaultCharset());
+        String url = HttpUtil.urlWithForm(BASE_URL + "/sns/getuserinfo_bycode", Dict.create().set("accessKey", appId).set("timestamp", timestamp).set("signature", SignUtils.urlEncode(signature)), Charset.defaultCharset(), false);
         JSONObject formBody = new JSONObject().set("tmp_auth_code", code);
         // 调用接口
         ApiResult<JSONObject> callApiResult = baseCallApiPostJson(url, null, formBody);
@@ -268,7 +268,7 @@ public class DingTalkApi {
         if (StrUtil.hasBlank(accessToken, code)) {
             return apiResult.error(ApiResult.ERROR_CODE_PARAMS, "参数不能为空");
         }
-        String url = HttpUtil.urlWithFormUrlEncoded(BASE_URL + "/topapi/v2/user/getuserinfo", Dict.create().set("access_token", accessToken), Charset.defaultCharset());
+        String url = HttpUtil.urlWithForm(BASE_URL + "/topapi/v2/user/getuserinfo", Dict.create().set("access_token", accessToken), Charset.defaultCharset(), false);
         JSONObject formBody = new JSONObject().set("code", code);
         // 调用接口
         ApiResult<JSONObject> callApiResult = baseCallApiPostJson(url, null, formBody);
@@ -387,7 +387,7 @@ public class DingTalkApi {
         if (StrUtil.hasBlank(accessToken)) {
             return apiResult.error(ApiResult.ERROR_CODE_PARAMS, "参数不能为空");
         }
-        String url = HttpUtil.urlWithFormUrlEncoded(BASE_URL + "/media/upload", Dict.create().set("access_token", accessToken), Charset.defaultCharset());
+        String url = HttpUtil.urlWithForm(BASE_URL + "/media/upload", Dict.create().set("access_token", accessToken), Charset.defaultCharset(), false);
         try {
             HttpRequest request = HttpRequest
                     .post(url)

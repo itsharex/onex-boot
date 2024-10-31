@@ -11,7 +11,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.pojo.Const;
-import com.nb6868.onex.common.util.JacksonUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.msg.MsgConst;
 import com.nb6868.onex.msg.entity.MsgLogEntity;
@@ -19,12 +18,8 @@ import com.nb6868.onex.msg.entity.MsgTplEntity;
 import com.nb6868.onex.msg.service.MsgLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 /**
  * 短信 聚合 消息服务
@@ -68,11 +63,11 @@ public class SmsJuheMailService extends AbstractMailService {
         // 调用接口发送
         try {
             // "http://v.juhe.cn/sms/send?key={1}&mobile={2}&tpl_id={3}&tpl_value={4}"
-            String url = HttpUtil.urlWithFormUrlEncoded(BASE_URL + "/sms/send", Dict.create()
+            String url = HttpUtil.urlWithForm(BASE_URL + "/sms/send", Dict.create()
                     .set("key", mailTpl.getParams().getStr("AppKeyId"))
                     .set("tpl_id", mailTpl.getParams().getStr("TemplateId"))
                     .set("tpl_value", paramJuhe.toString())
-                    .set("mobile", request.getMailTo()), Charset.defaultCharset());
+                    .set("mobile", request.getMailTo()), Charset.defaultCharset(), false);
             String result = HttpUtil.get(url);
             JSONObject resultJson = JSONUtil.parseObj(result);
             mailLog.setResult(result);

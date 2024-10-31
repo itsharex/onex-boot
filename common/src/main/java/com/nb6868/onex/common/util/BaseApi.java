@@ -34,7 +34,7 @@ public class BaseApi {
         }
         cn.hutool.core.date.TimeInterval timeInterval = DateUtil.timer();
         // 将参数拼接到url上
-        String url = HttpUtil.urlWithFormUrlEncoded(baseUrl, paramMap, Charset.defaultCharset());
+        String url = HttpUtil.urlWithForm(baseUrl, paramMap, Charset.defaultCharset(), false);
         try {
             HttpRequest request = HttpRequest.get(url);
             log.debug(request.toString());
