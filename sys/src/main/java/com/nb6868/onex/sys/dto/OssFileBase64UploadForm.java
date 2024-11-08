@@ -2,6 +2,7 @@ package com.nb6868.onex.sys.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nb6868.onex.common.pojo.BaseForm;
+import com.nb6868.onex.sys.SysConst;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.EqualsAndHashCode;
 public class OssFileBase64UploadForm extends BaseForm {
 
     @Schema(description = "配置参数名")
-    private String paramsCode = "OSS_PUBLIC";
+    private String paramsCode = SysConst.OSS_PUBLIC;
 
     @Schema(description = "文件前缀")
     private String prefix;

@@ -24,6 +24,7 @@ import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.util.MultipartFileUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.PageGroup;
+import com.nb6868.onex.sys.SysConst;
 import com.nb6868.onex.sys.dto.OssFileBase64UploadForm;
 import com.nb6868.onex.sys.dto.OssPreSignedForm;
 import com.nb6868.onex.sys.dto.OssQueryForm;
@@ -58,10 +59,10 @@ public class OssController {
     BaseParamsService paramsService;
 
     @PostMapping("uploadAnon")
-    @Operation(summary = "匿名上传文件(文件形式)")
-    @AccessControl
+    @Operation(summary = "匿名上传文件(文件形式)", description = "不再提供匿名,有需要手动放行")
+    // @AccessControl
     @ApiOperationSupport(order = 10)
-    public Result<?> uploadAnon(@RequestParam(required = false, defaultValue = "OSS_PUBLIC") String paramsCode,
+    public Result<?> uploadAnon(@RequestParam(required = false, defaultValue = SysConst.OSS_PUBLIC) String paramsCode,
                                 @RequestParam(required = false) String prefix,
                                 @RequestPart MultipartFile file) {
         AssertUtils.isTrue(file.isEmpty(), ErrorCode.UPLOAD_FILE_EMPTY);
@@ -91,7 +92,7 @@ public class OssController {
     @PostMapping("upload")
     @Operation(summary = "上传文件(文件形式)")
     @ApiOperationSupport(order = 20)
-    public Result<?> upload(@RequestParam(required = false, defaultValue = "OSS_PUBLIC") String paramsCode,
+    public Result<?> upload(@RequestParam(required = false, defaultValue = SysConst.OSS_PUBLIC) String paramsCode,
                             @RequestParam(required = false) String prefix,
                             @RequestPart MultipartFile file) {
         AssertUtils.isTrue(file.isEmpty(), ErrorCode.UPLOAD_FILE_EMPTY);
@@ -147,8 +148,8 @@ public class OssController {
     }
 
     @PostMapping("anonUploadBase64")
-    @Operation(summary = "匿名上传单文件(base64)", description = "@Anon")
-    @AccessControl
+    @Operation(summary = "匿名上传单文件(base64)", description = "不再提供匿名,有需要手动放行")
+    // @AccessControl
     @ApiOperationSupport(order = 30)
     public Result<?> anonUploadBase64(@Validated @RequestBody OssFileBase64UploadForm form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
@@ -199,9 +200,10 @@ public class OssController {
     }
 
     @PostMapping("anonUploadMulti")
-    @Operation(summary = "匿名上传多文件", description = "@Anon")
+    @Operation(summary = "匿名上传多文件", description = "不再提供匿名,有需要手动放行")
+    // @AccessControl
     @ApiOperationSupport(order = 50)
-    public Result<?> anonUploadMulti(@RequestParam(required = false, defaultValue = "OSS_PUBLIC") String paramsCode,
+    public Result<?> anonUploadMulti(@RequestParam(required = false, defaultValue = SysConst.OSS_PUBLIC) String paramsCode,
                                      @RequestParam(required = false) String prefix,
                                      @RequestPart @NotEmpty(message = "文件不能为空") MultipartFile[] files) {
         List<String> srcList = new ArrayList<>();
@@ -233,7 +235,7 @@ public class OssController {
     @PostMapping("uploadMulti")
     @Operation(summary = "上传多文件")
     @ApiOperationSupport(order = 60)
-    public Result<?> uploadMulti(@RequestParam(required = false, defaultValue = "OSS_PUBLIC") String paramsCode,
+    public Result<?> uploadMulti(@RequestParam(required = false, defaultValue = SysConst.OSS_PUBLIC) String paramsCode,
                                  @RequestParam(required = false) String prefix,
                                  @RequestPart @NotEmpty(message = "文件不能为空") MultipartFile[] files) {
         List<String> srcList = new ArrayList<>();
@@ -286,7 +288,7 @@ public class OssController {
 
     @PostMapping("getPreSignedPostForm")
     @Operation(summary = "获得已签名的post表单参数")
-    @ApiOperationSupport(order = 70)
+    @ApiOperationSupport(order = 80)
     public Result<?> getPreSignedPostForm(@Validated @RequestBody OssPreSignedForm form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
