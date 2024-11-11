@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## [4.1.98] 2024.11.08
+## [4.1.99] 2024.11.08
 - new: upgrade aliyun oss api support
 - enhance: hidden upload anno method
 - upgrade: upgrade hutool to 5.8.33
+- enhance: change no token auth tips
 
 ## [4.1.89] 2024.10.25
 - new: upgrade aliyun oss api support

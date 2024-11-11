@@ -1,6 +1,7 @@
 package com.nb6868.onex.common.filter;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.pojo.Result;
@@ -29,7 +30,7 @@ public abstract class BaseShiroFilter extends AuthenticatingFilter {
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
         AuthenticationToken token = createToken(request, response);
         if (token == null) {
-            return onLoginFailure(token, null, request, response);
+            return onLoginFailure(token, new AuthenticationException("请先登录..."), request, response);
         }
         try {
             Subject subject = getSubject(request, response);
@@ -75,9 +76,11 @@ public abstract class BaseShiroFilter extends AuthenticatingFilter {
 
         // 处理登录失败的异常
         Result<?> result = new Result<>().error(ErrorCode.UNAUTHORIZED);
-        String errorMsg = ExceptionUtil.getSimpleMessage(e);
-        if (StrUtil.isNotBlank(errorMsg)) {
-            result.setMsg(errorMsg);
+        if (ObjUtil.isNotNull(e)) {
+            String errorMsg = ExceptionUtil.getSimpleMessage(e);
+            if (StrUtil.isNotBlank(errorMsg)) {
+                result.setMsg(errorMsg);
+            }
         }
         httpResponse.getWriter().print(JacksonUtils.pojoToJson(result));
     }
