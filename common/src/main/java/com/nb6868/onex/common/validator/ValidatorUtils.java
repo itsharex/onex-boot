@@ -28,6 +28,20 @@ public class ValidatorUtils {
      * @param groups 待校验的组
      */
     public static void validateEntity(Object object, Class<?>... groups) {
+        validateEntity(true, object, groups);
+    }
+
+    /**
+     * 校验对象,出错抛出自定义异常
+     *
+     * @param condition 校验条件
+     * @param object 待校验对象
+     * @param groups 待校验的组
+     */
+    public static void validateEntity(boolean condition, Object object, Class<?>... groups) {
+        if (!condition) {
+            return;
+        }
         MsgResult result = getValidateResult(object, groups);
         AssertUtils.isFalse(result.isSuccess(), result.getCode(), result.getMsg());
     }
