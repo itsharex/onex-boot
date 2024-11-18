@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.2.2] 2024.11.18
+- upgrade: upgrade shiro to 2.0.2
+- new: add BaseReq
+
 ## [4.1.99] 2024.11.08
 - new: upgrade aliyun oss api support
 - enhance: hidden upload anno method

@@ -108,7 +108,7 @@ public class StringTest {
     @Test
     @DisplayName("passwordEncode")
     void passwordEncode() {
-        String raw = "123456";
+        String raw = "quanzhou@2024";
         log.error("password={}", PasswordUtils.encode(raw));
         log.error("password={}", PasswordUtils.aesEncode(raw, Const.AES_KEY));
     }
