@@ -12,6 +12,8 @@ import com.nb6868.onex.common.util.HttpContextUtils;
 import com.nb6868.onex.common.util.MessageUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -33,9 +35,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -132,6 +133,19 @@ public abstract class BaseExceptionHandler {
         log.error("MissingServletRequestPartException", e);
         saveLog(request, new OnexException(ErrorCode.ERROR_REQUEST, e.getMessage()));
         return handleExceptionResult(request, ErrorCode.ERROR_REQUEST, e.getMessage());
+    }
+
+    /**
+     * 处理未找到资源异常
+     *
+     * @param e exception
+     * @return result
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Object handleNoResourceFoundException(HttpServletRequest request, NoResourceFoundException e) {
+        log.error("NoResourceFoundException", e);
+        // saveLog(request, new OnexException(ErrorCode.ERROR_REQUEST, e.getMessage()));
+        return handleExceptionResult(request, ErrorCode.NOT_FOUND, e.getMessage());
     }
 
     /**
