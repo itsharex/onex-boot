@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * 基础的ExceptionHandler.
  * 继承后加上@RestControllerAdvice
  *
- * @author Charles (zhancgchaoxu@gmail.com)
+ * @author Charles zhancgchaoxu@gmail.com
  */
 @Slf4j
 public abstract class BaseExceptionHandler {
@@ -358,29 +358,5 @@ public abstract class BaseExceptionHandler {
             log.error("exception saveLog Error", e);
         }
     }
-
-   /*
-    记得先 implements RequestBodyAdvice
-
-    @Override
-    public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        //判断是否有此注解,只有为true时才会执行afterBodyRead
-        return methodParameter.getParameterAnnotation(RequestBody.class) != null;
-    }
-
-    @Override
-    public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
-        return new MappingJacksonInputMessage(inputMessage.getBody(), inputMessage.getHeaders());
-    }
-
-    @Override
-    public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return body;
-    }
-
-    @Override
-    public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return body;
-    }*/
 
 }

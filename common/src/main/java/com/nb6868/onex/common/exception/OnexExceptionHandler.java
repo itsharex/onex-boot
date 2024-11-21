@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * 异常处理器
  *
- * @author Charles (zhancgchaoxu@gmail.com)
+ * @author Charles zhancgchaoxu@gmail.com
  */
 @RestControllerAdvice
 @ConditionalOnProperty(name = "onex.exception-handler.enable", havingValue = "true")
