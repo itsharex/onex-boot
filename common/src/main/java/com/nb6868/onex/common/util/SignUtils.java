@@ -68,7 +68,7 @@ public class SignUtils {
      * 参数转为字符串
      *
      * @param params            参数
-     * @param paramDelimiter    参数与参数之间分隔符 默认&
+     * @param paramDelimiter    参数与参数之间分隔符 默认逻辑与
      * @param keyValueDelimiter 参数键值之间分隔符 默认=
      * @return 拼接后的内容
      */

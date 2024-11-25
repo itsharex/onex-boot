@@ -36,7 +36,7 @@ public class AliyunOssApiTest {
         FileUtil.writeUtf8String("sss", path);
 
         FileUtil.file("D:\\WorkspacesData\\dc\\" + IdUtil.fastSimpleUUID() +".txt");
-        Props props = new Props("confidential/oss.properties");
+        Props props = new Props("confidential/oss-storage.properties");
         ApiResult<JSONObject> result = AliyunOssApi.putObject(props.getStr("accessKeyId"), props.getStr("accessKeySecret"), props.getStr("endPoint"), props.getStr("region"), props.getStr("bucketName"), "test/换行(2) " + IdUtil.fastSimpleUUID() + ".txt", null, FileUtil.getInputStream(path));
         log.error(result.toString());
     }
