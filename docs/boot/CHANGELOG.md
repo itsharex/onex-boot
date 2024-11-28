@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [4.2.6] 2024.11.28
+- upgrade: upgrade hutool to 5.8.34
+- upgrade: upgrade jsoup to 1.18.2
+- upgrade: upgrade aws-s3 to 2.29.22
+
 ## [4.2.2] 2024.11.18
 - upgrade: upgrade shiro to 2.0.2
 - new: add BaseReq
