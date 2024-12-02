@@ -4,10 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -16,6 +14,8 @@ import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.oss.OssLocalUtils;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.springframework.http.HttpHeaders;
 
 import java.io.IOException;
@@ -31,6 +31,7 @@ import java.util.function.Function;
  *
  * @author Charles zhangchaoxu@gmail.com
  */
+@Slf4j
 public class ExcelExportUtils {
 
     public final static String CONTENT_TYPE_XLS = "application/vnd.ms-excel";
@@ -64,7 +65,7 @@ public class ExcelExportUtils {
      * @param bean   实体bean
      * @param column 列定义
      */
-    public static Object formatColumnValue(Object bean, ExcelExportParams.ColumnParams column, int index, Function<Dict, String> function) {
+    public static Object formatColumnValue(ExcelWriter excelWriter, Object bean, ExcelExportParams.ColumnParams column, int index, Function<Dict, String> function) {
         String fmt = column.getFmt();
         try {
             if (StrUtil.isBlank(fmt)) {
@@ -103,11 +104,19 @@ public class ExcelExportUtils {
                 } else if (function != null) {
                     pValue = function.apply(Dict.create().set("bean", bean).set("column", column));
                 }
-                return StrUtil.emptyToDefault(pValue, column.getEmptyToDefault());
+                if (column.isLink()) {
+                    // 链接
+                    // 获得链接地址
+                    String linkValue = ReflectUtil.invoke(bean, "get" + StrUtil.upperFirst(column.getLinkProperty()));
+                    return excelWriter.createHyperlink(HyperlinkType.URL, linkValue, StrUtil.emptyToDefault(pValue, column.getEmptyToDefault()));
+                } else {
+                    // 非链接，直接输出文本
+                    return StrUtil.emptyToDefault(pValue, column.getEmptyToDefault());
+                }
             }
         } catch (Exception e) {
             // 遇到问题返回异常,便于从结果中发现问题
-            e.printStackTrace();
+            log.error("转换excel的column失败", e);
             return StrUtil.nullToDefault(column.getErrorDefaultMsg(), e.getMessage());
         }
     }
@@ -127,7 +136,10 @@ public class ExcelExportUtils {
             mapList = new ArrayList<>();
             beanList.forEach(bean -> {
                 Map<String, Object> row = new LinkedHashMap<>();
-                excelExportParams.getColumns().forEach(columnParams -> row.put(columnParams.getTitle(), formatColumnValue(bean, columnParams, mapList.size() + 1, function)));
+                excelExportParams.getColumns().forEach(columnParams -> {
+                    // 按行插入内容
+                    row.put(columnParams.getTitle(), formatColumnValue(writer, bean, columnParams, mapList.size() + 1, function));
+                });
                 mapList.add(row);
             });
             // 设置宽度

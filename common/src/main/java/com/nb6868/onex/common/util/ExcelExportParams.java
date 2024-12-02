@@ -58,6 +58,9 @@ public class ExcelExportParams {
         @Schema(description = "是否链接")
         private boolean link;
 
+        @Schema(description = "链接属性")
+        private String linkProperty;
+
         @Schema(description = "格式化方法,空用默认，time")
         private String fmt;
 
