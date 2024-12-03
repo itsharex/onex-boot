@@ -144,7 +144,6 @@ public abstract class BaseExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public Object handleNoResourceFoundException(HttpServletRequest request, NoResourceFoundException e) {
         log.error("NoResourceFoundException", e);
-        // saveLog(request, new OnexException(ErrorCode.ERROR_REQUEST, e.getMessage()));
         return handleExceptionResult(request, ErrorCode.NOT_FOUND, e.getMessage());
     }
 
