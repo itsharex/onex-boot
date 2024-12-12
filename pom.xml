@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
     <groupId>com.nb6868.onex</groupId>
     <artifactId>onex-boot</artifactId>
-    <version>4.2.11</version>
+    <version>4.2.13</version>
     <name>onex-boot</name>
     <description>OneX Admin Boot</description>
     <url>https://onex.nb6868.com/</url>
@@ -63,13 +63,13 @@
         <!-- maven build libs -->
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
-        <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <!-- libs -->
         <shiro.version>2.0.2</shiro.version>
-        <onex.version>4.2.11</onex.version>
+        <onex.version>4.2.13</onex.version>
     </properties>
 
     <dependencies>
@@ -241,6 +241,10 @@
                             <name>build.time</name>
                             <pattern>yyyyMMddHHmmss</pattern>
                             <timeZone>GMT+8</timeZone>
+                            <fileSet/>
+                            <regex/>
+                            <source/>
+                            <value/>
                         </configuration>
                     </plugin>
                 </plugins>
