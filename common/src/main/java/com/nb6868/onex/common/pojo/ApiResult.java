@@ -90,6 +90,7 @@ public class ApiResult<T> implements Serializable {
         this.setSuccess(apiResult.isSuccess());
         this.setCode(apiResult.getCode());
         this.setMsg(apiResult.getMsg());
+        this.setRetry(apiResult.isRetry());
         return this;
     }
 
