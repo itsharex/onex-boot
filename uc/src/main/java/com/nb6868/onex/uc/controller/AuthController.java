@@ -17,6 +17,7 @@ import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.msg.MsgLogBody;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.msg.MsgTplBody;
+import com.nb6868.onex.common.pojo.BaseForm;
 import com.nb6868.onex.common.pojo.Const;
 import com.nb6868.onex.common.pojo.EncryptForm;
 import com.nb6868.onex.common.pojo.Result;
@@ -71,11 +72,20 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "图形验证码(base64)", description = "Anon")
     @ApiOperationSupport(order = 10)
-    public Result<?> captcha(@Validated @RequestBody CaptchaForm form) {
+    public Result<?> captcha(@Validated @RequestBody BaseForm form) {
+        // 获得登录验证码配置,设置默认杜绝空信息
+        JSONObject captchaParams = paramsService.getSystemPropsObject("CAPTCHA_LOGIN", JSONObject.class, new JSONObject());
+        // uuid是用来存和后续对比图片验证码的
         String uuid = IdUtil.fastSimpleUUID();
-        String captchaBase64 = captchaService.createCaptchaBase64(uuid, form.getWidth(), form.getHeight());
+        // 生成图片，并将uuid和图片内容作为kv存入缓存
+        String captchaBase64 = captchaService.createCaptchaBase64(uuid,
+                captchaParams.getStr("type", "circle"),
+                captchaParams.getStr("randomBase", "0123456789"),
+                captchaParams.getInt("randomLength", 4),
+                captchaParams.getInt("width", 110),
+                captchaParams.getInt("height", 40));
         // 将uuid和图片base64返回给前端
-        Dict result = Dict.create().set("uuid", uuid).set("image", captchaBase64);
+        JSONObject result = new JSONObject().set("uuid", uuid).set("image", captchaBase64);
         return new Result<>().success(result);
     }
 

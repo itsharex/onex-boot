@@ -2,8 +2,8 @@ package com.nb6868.onex.uc.service;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
+import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.CircleCaptcha;
 import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,17 +29,27 @@ public class CaptchaService {
      * 验证码机制是将验证码的内容和对应的uuid的对应关系存入缓存,然后验证的时候从缓存中去匹配
      * uuid不应该由前端生成,否则容易伪造和被攻击
      *
-     * @param uuid   uuid
-     * @param width  宽度
-     * @param height 高度
-     * @return 生成的图片
+     * @param uuid         uuid
+     * @param captchaType  验证码类型，比如circle
+     * @param randomBase   随机验证码的文本基础,比如0123456789
+     * @param randomLength 随机验证码的长度,建议4或者6
+     * @param width        宽度 建议110
+     * @param height       高度 建议40
+     * @return 生成的图片base64内容
      */
-    public String createCaptchaBase64(String uuid, int width, int height) {
-        CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(width, height);
-        captcha.setGenerator(new RandomGenerator("0123456789", 4));
-        captcha.getCode();
-
-        // 保存到缓存
+    public String createCaptchaBase64(String uuid, String captchaType, String randomBase, int randomLength, int width, int height) {
+        // 根据验证码类型生成不同的验证码
+        AbstractCaptcha captcha = switch (captchaType) {
+            // 默认circle,所以不做定义
+            // case "circle" -> CaptchaUtil.createCircleCaptcha(width, height);
+            case "gif" -> CaptchaUtil.createGifCaptcha(width, height);
+            case "line" -> CaptchaUtil.createLineCaptcha(width, height);
+            case "shear" -> CaptchaUtil.createShearCaptcha(width, height);
+            default -> CaptchaUtil.createCircleCaptcha(width, height);
+        };
+        // 定义随机内容和长度
+        captcha.setGenerator(new RandomGenerator(randomBase, randomLength));
+        // 将验证码内容保存到缓存
         captchaCache.put(uuid, captcha.getCode().toLowerCase());
         return captcha.getImageBase64Data();
     }
