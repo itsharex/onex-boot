@@ -33,6 +33,7 @@ public class AuthService {
 
     /**
      * 帐号密码登录
+     *
      * @param form 登录请求
      * @param loginParams 登录参数
      * @return 登录用户
@@ -42,7 +43,9 @@ public class AuthService {
         ValidatorUtils.validateEntity(form, LoginForm.UsernamePasswordGroup.class);
         // 获得用户
         UserEntity user = userService.getByUsername(form.getTenantCode(), form.getUsername());
-        AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
+        // 这里存在一个争论点，是否要将具体的信息告知用户
+        // 告知的好处在于让用户有更清晰的错误提示ErrorCode.ACCOUNT_NOT_EXIST,但也会存在一个用户枚举遍历的风险
+        AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR);
         // 验证密码
         boolean passwordVerify = PasswordUtils.verify(form.getPassword(), user.getPassword());
         // 判断用户状态
@@ -82,7 +85,7 @@ public class AuthService {
         ValidatorUtils.validateEntity(form, LoginForm.MobileSmsGroup.class);
         // 获得用户
         UserEntity user = userService.getByMobile(form.getTenantCode(), form.getMobile());
-        AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
+        AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR);
         // 判断用户状态
         AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
         // 验证并将短信消费掉
