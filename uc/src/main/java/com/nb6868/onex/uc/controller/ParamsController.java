@@ -28,10 +28,7 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,6 +41,9 @@ public class ParamsController {
     @Autowired
     private ParamsService paramsService;
 
+    /**
+     * 也可以从@RequestHeader(value = "Origin") String originHeader获得
+     */
     @PostMapping("infoByCode")
     @AccessControl
     @Operation(summary = "通过编码获取配置信息")
