@@ -2,12 +2,14 @@ package com.nb6868.onex.uc.service;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.jwt.JWT;
 import com.nb6868.onex.common.jpa.EntityService;
 import com.nb6868.onex.uc.dao.TokenDao;
 import com.nb6868.onex.uc.entity.TokenEntity;
 import com.nb6868.onex.uc.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -21,6 +23,9 @@ import java.util.List;
  */
 @Service
 public class TokenService extends EntityService<TokenDao, TokenEntity> {
+
+    @Value("${onex.shiro.type:jwt}")
+    String shiroTokenType;
 
     /**
      * 生成token
@@ -39,7 +44,7 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
         // 1个世纪=永不过期
         Date expireDate = tokenExpire <= 0 ? DateUtil.offset(now, DateField.ERA, 1) : DateUtil.offsetSecond(now, tokenExpire);
         // 注意同一秒内生成的token是一致的
-        String jwtToken = JWT.create()
+        String token = StrUtil.equalsIgnoreCase("jwt", shiroTokenType) ? JWT.create()
                 .setSubject(loginType)
                 .setKey(tokenKey.getBytes())
                 .setIssuedAt(now)
@@ -53,9 +58,9 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
                 .setPayload("tenantCode", user.getTenantCode())
                 .setPayload("username", user.getUsername())
                 .setPayload("realName", user.getRealName())
-                .sign();
+                .sign() : IdUtil.fastSimpleUUID();
         // 判断一下token是否已存在
-        if ("db".equalsIgnoreCase(tokenStoreType) && !query().eq("token", jwtToken).exists()) {
+        if ("db".equalsIgnoreCase(tokenStoreType) && !query().eq("token", token).exists()) {
             // 在数据库中
             if (1 == tokenLimit) {
                 // 同type只允许一个
@@ -69,12 +74,12 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
             TokenEntity tokenEntity = new TokenEntity();
             tokenEntity.setUserId(user.getId());
             tokenEntity.setTenantCode(user.getTenantCode());
-            tokenEntity.setToken(jwtToken);
+            tokenEntity.setToken(token);
             tokenEntity.setType(loginType);
             tokenEntity.setExpireTime(expireDate);
             this.save(tokenEntity);
         }
-        return jwtToken;
+        return token;
     }
 
     /**
