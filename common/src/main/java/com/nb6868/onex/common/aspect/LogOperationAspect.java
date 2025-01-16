@@ -103,7 +103,7 @@ public class LogOperationAspect {
 
             }
         } catch (NoSuchMethodException ne) {
-            ne.printStackTrace();
+            log.error("日志切片未找到对应的方法", ne);
         }
         if ("login".equalsIgnoreCase(logType)) {
             // 登录日志
@@ -157,6 +157,7 @@ public class LogOperationAspect {
 
     /**
      * 从joinPoint获取参数,其实是从方法的参数中获取，经过json解析后，会和实际传参有偏差
+     * 不要试图处理所有的情况,尽量处理吧
      */
     private String getMethodParam(ProceedingJoinPoint joinPoint) {
         // 请求参数,接口方法中的参数,可能会有HttpServletRequest、HttpServletResponse、ModelMap
