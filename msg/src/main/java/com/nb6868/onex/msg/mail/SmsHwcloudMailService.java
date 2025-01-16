@@ -12,7 +12,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.nb6868.onex.common.msg.MsgSendForm;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.msg.MsgConst;
 import com.nb6868.onex.msg.entity.MsgLogEntity;

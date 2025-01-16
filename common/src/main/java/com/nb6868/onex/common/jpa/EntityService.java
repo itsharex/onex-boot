@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.repository.CrudRepository;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.util.ConvertUtils;
 import org.apache.ibatis.binding.MapperMethod;

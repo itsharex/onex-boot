@@ -3,8 +3,8 @@ package com.nb6868.onex.sys.controller;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdReq;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -13,7 +13,7 @@ import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.sys.dto.DictDTO;
-import com.nb6868.onex.sys.dto.DictQueryForm;
+import com.nb6868.onex.sys.dto.DictQueryReq;
 import com.nb6868.onex.sys.service.DictService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ public class DictController {
     @PostMapping("page")
     @Operation(summary = "字典分类")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:query"}, logical = Logical.OR)
-    public Result<?> page(@Validated(PageGroup.class) @RequestBody DictQueryForm form) {
+    public Result<?> page(@Validated(PageGroup.class) @RequestBody DictQueryReq form) {
         PageData<?> page = dictService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -46,7 +46,7 @@ public class DictController {
     @PostMapping("list")
     @Operation(summary = "字典分类数据")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:query"}, logical = Logical.OR)
-    public Result<?> list(@Validated @RequestBody DictQueryForm form) {
+    public Result<?> list(@Validated @RequestBody DictQueryReq form) {
         List<?> list = dictService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -55,7 +55,7 @@ public class DictController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:query"}, logical = Logical.OR)
-    public Result<DictDTO> info(@Validated @RequestBody IdForm form) {
+    public Result<DictDTO> info(@Validated @RequestBody IdReq form) {
         DictDTO data = dictService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -86,7 +86,7 @@ public class DictController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         dictService.removeById(form.getId());
 
         return new Result<>();
@@ -96,7 +96,7 @@ public class DictController {
     @Operation(summary = "批量删除")
     @LogOperation("批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
         dictService.removeByIds(form.getIds());
 
         return new Result<>();

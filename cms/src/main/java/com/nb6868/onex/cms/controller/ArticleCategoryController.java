@@ -1,7 +1,7 @@
 package com.nb6868.onex.cms.controller;
 
 import com.nb6868.onex.cms.dto.ArticleCategoryDTO;
-import com.nb6868.onex.cms.dto.ArticleCategoryQueryForm;
+import com.nb6868.onex.cms.dto.ArticleCategoryQueryReq;
 import com.nb6868.onex.cms.entity.ArticleCategoryEntity;
 import com.nb6868.onex.cms.service.ArticleCategoryService;
 import com.nb6868.onex.cms.service.ArticleService;
@@ -9,7 +9,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -48,7 +48,7 @@ public class ArticleCategoryController {
     @Operation(summary = "列表")
     @RequiresPermissions("cms:articleCategory:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> list(@Validated @RequestBody ArticleCategoryQueryForm form) {
+    public Result<?> list(@Validated @RequestBody ArticleCategoryQueryReq form) {
         List<?> list = articleCategoryService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -58,7 +58,7 @@ public class ArticleCategoryController {
     @Operation(summary = "分页")
     @RequiresPermissions("cms:articleCategory:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ArticleCategoryQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ArticleCategoryQueryReq form) {
         PageData<?> page = articleCategoryService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -68,7 +68,7 @@ public class ArticleCategoryController {
     @Operation(summary = "信息")
     @RequiresPermissions("cms:articleCategory:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         ArticleCategoryDTO data = articleCategoryService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -102,7 +102,7 @@ public class ArticleCategoryController {
     @LogOperation("删除")
     @RequiresPermissions("cms:articleCategory:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据是否存在
         ArticleCategoryEntity data = articleCategoryService.getOne(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);

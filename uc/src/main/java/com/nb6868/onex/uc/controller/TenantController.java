@@ -5,7 +5,7 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -14,7 +14,7 @@ import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.TenantDTO;
-import com.nb6868.onex.uc.dto.TenantQueryForm;
+import com.nb6868.onex.uc.dto.TenantQueryReq;
 import com.nb6868.onex.uc.entity.TenantEntity;
 import com.nb6868.onex.uc.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +42,7 @@ public class TenantController {
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 10)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody TenantQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody TenantQueryReq form) {
         QueryWrapper<TenantEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "page");
         PageData<?> page = tenantService.pageDto(form, queryWrapper);
 
@@ -53,7 +53,7 @@ public class TenantController {
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 20)
-    public Result<?> list(@Validated @RequestBody TenantQueryForm form) {
+    public Result<?> list(@Validated @RequestBody TenantQueryReq form) {
         QueryWrapper<TenantEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         List<?> list = tenantService.listDto(queryWrapper);
 
@@ -64,7 +64,7 @@ public class TenantController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 30)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         TenantDTO data = tenantService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -98,7 +98,7 @@ public class TenantController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 100)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         tenantService.removeById(form.getId());
         // 按业务需求做其它操作
         return new Result<>();

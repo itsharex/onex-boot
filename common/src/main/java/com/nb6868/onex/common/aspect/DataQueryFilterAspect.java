@@ -5,7 +5,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
-import com.nb6868.onex.common.pojo.BaseForm;
+import com.nb6868.onex.common.pojo.BaseReq;
 import com.nb6868.onex.common.shiro.ShiroUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import org.aspectj.lang.JoinPoint;
@@ -50,7 +50,7 @@ public class DataQueryFilterAspect {
         QueryDataScope queryDataScope = method.getAnnotation(QueryDataScope.class);
         if (queryDataScope != null) {
             Object params = point.getArgs()[0];
-            if (params instanceof BaseForm) {
+            if (params instanceof BaseReq) {
                 if (queryDataScope.tenantFilter()) {
                     // 租户过滤
                     String tenantCode = ShiroUtils.getUserTenantCode();

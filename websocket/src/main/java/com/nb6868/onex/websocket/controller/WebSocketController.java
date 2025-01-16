@@ -3,7 +3,7 @@ package com.nb6868.onex.websocket.controller;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
-import com.nb6868.onex.websocket.form.WebSocketSendForm;
+import com.nb6868.onex.websocket.dto.WebSocketSendReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.Logical;
@@ -36,7 +36,7 @@ public class WebSocketController {
     @Operation(summary = "发送单点消息")
     @RequiresPermissions(value = {"admin:super", "admin:websocket", "sys:websocket:send"}, logical = Logical.OR)
     @ApiOperationSupport(order = 20)
-    public Result<?> sendOneMessage(@Validated(value = {DefaultGroup.class, WebSocketSendForm.SendOneGroup.class}) @RequestBody WebSocketSendForm form) {
+    public Result<?> sendOneMessage(@Validated(value = {DefaultGroup.class, WebSocketSendReq.SendOneGroup.class}) @RequestBody WebSocketSendReq form) {
         boolean result = webSocketServer.sendOneMessage(form.getSid(), form.getContent());
         return new Result<>().bool(result);
     }
@@ -45,7 +45,7 @@ public class WebSocketController {
     @Operation(summary = "发送批量消息")
     @RequiresPermissions(value = {"admin:super", "admin:websocket", "sys:websocket:send"}, logical = Logical.OR)
     @ApiOperationSupport(order = 30)
-    public Result<?> sendMultiMessage(@Validated(value = {DefaultGroup.class, WebSocketSendForm.SendMultiGroup.class}) @RequestBody WebSocketSendForm form) {
+    public Result<?> sendMultiMessage(@Validated(value = {DefaultGroup.class, WebSocketSendReq.SendMultiGroup.class}) @RequestBody WebSocketSendReq form) {
         webSocketServer.sendMultiMessage(form.getSidList(), form.getContent());
         return new Result<>();
     }
@@ -54,7 +54,7 @@ public class WebSocketController {
     @Operation(summary = "发送广播消息")
     @RequiresPermissions(value = {"admin:super", "admin:websocket", "sys:websocket:send"}, logical = Logical.OR)
     @ApiOperationSupport(order = 40)
-    public Result<?> sendAllMessage(@Validated(value = {DefaultGroup.class}) @RequestBody WebSocketSendForm socketSendRequest) {
+    public Result<?> sendAllMessage(@Validated(value = {DefaultGroup.class}) @RequestBody WebSocketSendReq socketSendRequest) {
         webSocketServer.sendAllMessage(socketSendRequest.getContent());
         return new Result<>();
     }

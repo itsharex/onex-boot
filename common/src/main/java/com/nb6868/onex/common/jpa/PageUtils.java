@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.nb6868.onex.common.pojo.Const;
-import com.nb6868.onex.common.pojo.PageForm;
+import com.nb6868.onex.common.Const;
+import com.nb6868.onex.common.pojo.PageReq;
 import com.nb6868.onex.common.pojo.SortItem;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ public class PageUtils {
      *
      * @param pageForm 分页查询表单
      */
-    public static <T> IPage<T> getPageByForm(PageForm pageForm) {
+    public static <T> IPage<T> getPageByForm(PageReq pageForm) {
         // 分页对象 参数,当前页和每页数
         Page<T> page = Page.of(Opt.ofNullable(pageForm.getPageNo()).orElse(Const.DEFAULT_PAGE_NO), Opt.ofNullable(pageForm.getPageSize()).orElse(Const.DEFAULT_PAGE_SIZE));
         // 排序

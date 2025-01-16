@@ -10,6 +10,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.auth.*;
@@ -18,19 +19,17 @@ import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.msg.MsgLogBody;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.msg.MsgTplBody;
-import com.nb6868.onex.common.pojo.ApiResult;
-import com.nb6868.onex.common.pojo.BaseForm;
-import com.nb6868.onex.common.pojo.Const;
-import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.pojo.*;
 import com.nb6868.onex.common.shiro.ShiroUser;
 import com.nb6868.onex.common.shiro.ShiroUtils;
 import com.nb6868.onex.common.util.*;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.ValidatorUtils;
+import com.nb6868.onex.common.validator.group.CaptchaGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dto.MenuResult;
-import com.nb6868.onex.uc.dto.MenuScopeForm;
+import com.nb6868.onex.uc.dto.MenuScopeReq;
 import com.nb6868.onex.uc.dto.MenuScopeResult;
 import com.nb6868.onex.uc.dto.UserDTO;
 import com.nb6868.onex.uc.entity.UserEntity;
@@ -80,7 +79,7 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "图形验证码(base64)", description = "Anon")
     @ApiOperationSupport(order = 10)
-    public Result<?> captcha(@Validated @RequestBody BaseForm form) {
+    public Result<?> captcha(@Validated @RequestBody BaseReq form) {
         // 获得登录验证码配置,设置默认杜绝空信息
         JSONObject captchaParams = paramsService.getSystemPropsObject("CAPTCHA_LOGIN", JSONObject.class, new JSONObject());
         // uuid是用来存和后续对比图片验证码的
@@ -99,17 +98,17 @@ public class AuthController {
 
     @PostMapping("userLogin")
     @AccessControl
-    @Operation(summary = "用户账号登录", description = "Anon")
-    @LogOperation(value = "用户账号登录", type = "login")
+    @Operation(summary = "用户账号密码登录", description = "Anon")
+    @LogOperation(value = "用户账号密码登录", type = "login")
     @ApiOperationSupport(order = 20)
-    public Result<?> userLogin(@Validated(value = {DefaultGroup.class}) @RequestBody UserLoginForm form) {
+    public Result<?> userLogin(@Validated(value = {DefaultGroup.class}) @RequestBody LoginByUsernamePasswordReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
         AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
         // 验证验证码
         if (loginParams.getBool("captcha", false)) {
             // 先检验验证码表单
-            ValidatorUtils.validateEntity(form, LoginForm.CaptchaGroup.class);
+            ValidatorUtils.validateEntity(form, CaptchaGroup.class);
             // 再校验验证码与魔术验证码不同，并且 校验失败
             AssertUtils.isTrue(!form.getCaptchaValue().equalsIgnoreCase(loginParams.getStr("magicCaptcha")) && !captchaService.validate(form.getCaptchaUuid(), form.getCaptchaValue()), ErrorCode.CAPTCHA_ERROR);
         }
@@ -129,12 +128,12 @@ public class AuthController {
         return new Result<>().success(loginResult);
     }
 
-    @PostMapping("userLoginByDingtalkCode")
+    @PostMapping("userLoginByCode")
     @AccessControl
-    @Operation(summary = "钉钉免密code登录", description = "Anon")
-    @LogOperation(value = "钉钉免密code登录", type = "login")
+    @Operation(summary = "授权code登录,如钉钉", description = "Anon")
+    @LogOperation(value = "授权code登录", type = "login")
     @ApiOperationSupport(order = 30)
-    public Result<?> userLoginByCode(@Validated(value = {DefaultGroup.class}) @RequestBody CodeLoginForm form) {
+    public Result<?> userLoginByCode(@Validated(value = {DefaultGroup.class}) @RequestBody LoginByCodeReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
         AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
@@ -254,7 +253,7 @@ public class AuthController {
     @Operation(summary = "用户修改密码")
     @LogOperation("用户修改密码")
     @ApiOperationSupport(order = 160)
-    public Result<?> userChangePassword(@Validated @RequestBody ChangePasswordForm form) {
+    public Result<?> userChangePassword(@Validated @RequestBody ChangePasswordReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
         AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
@@ -281,7 +280,7 @@ public class AuthController {
     @Operation(summary = "用户重置密码(帐号找回)")
     @LogOperation("用户重置密码(帐号找回)")
     @ApiOperationSupport(order = 164)
-    public Result<?> userResetPassword(@Validated @RequestBody ChangePasswordByMailCodeForm form) {
+    public Result<?> userResetPassword(@Validated @RequestBody ChangePasswordByMailCodeReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
         AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
@@ -309,7 +308,7 @@ public class AuthController {
     @PostMapping("userMenuScope")
     @Operation(summary = "用户权限范围", description = "返回包括菜单、路由、权限、角色等所有内容")
     @ApiOperationSupport(order = 200)
-    public Result<MenuScopeResult> userMenuScope(@Validated @RequestBody MenuScopeForm form) {
+    public Result<MenuScopeResult> userMenuScope(@Validated @RequestBody MenuScopeReq form) {
         ShiroUser user = ShiroUtils.getUser();
         // 过滤出其中显示菜单
         List<TreeNode<Long>> menuList = new ArrayList<>();

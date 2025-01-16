@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Range;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Schema(name = "修改状态请求")
-public class ChangeStateForm extends IdForm {
+public class ChangeStateForm extends IdReq {
 
     /**
      * 状态只能取值0-1

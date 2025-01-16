@@ -7,7 +7,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.util.JacksonUtils;
@@ -18,8 +18,8 @@ import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dto.ParamsDTO;
-import com.nb6868.onex.uc.dto.ParamsInfoQueryForm;
-import com.nb6868.onex.uc.dto.ParamsQueryForm;
+import com.nb6868.onex.uc.dto.ParamsInfoQueryReq;
+import com.nb6868.onex.uc.dto.ParamsQueryReq;
 import com.nb6868.onex.uc.entity.ParamsEntity;
 import com.nb6868.onex.uc.service.ParamsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +48,7 @@ public class ParamsController {
     @AccessControl
     @Operation(summary = "通过编码获取配置信息")
     @ApiOperationSupport(order = 5)
-    public Result<?> infoByCode(@Validated @RequestBody ParamsInfoQueryForm form) {
+    public Result<?> infoByCode(@Validated @RequestBody ParamsInfoQueryReq form) {
         QueryWrapper<ParamsEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         ParamsEntity data = paramsService.getOne(queryWrapper);
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
@@ -61,7 +61,7 @@ public class ParamsController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 8)
-    public Result<?> list(@RequestBody ParamsQueryForm form) {
+    public Result<?> list(@RequestBody ParamsQueryReq form) {
         List<?> list = paramsService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -72,7 +72,7 @@ public class ParamsController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 10)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ParamsQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ParamsQueryReq form) {
         PageData<?> page = paramsService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -83,7 +83,7 @@ public class ParamsController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 20)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         ParamsDTO data = paramsService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -118,7 +118,7 @@ public class ParamsController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         paramsService.removeById(form.getId());
         return new Result<>();
     }

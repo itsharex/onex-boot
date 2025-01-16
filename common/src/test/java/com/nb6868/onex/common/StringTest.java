@@ -2,7 +2,6 @@ package com.nb6868.onex.common;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.io.FileUtil;
@@ -19,10 +18,8 @@ import cn.hutool.extra.expression.engine.spel.SpELEngine;
 import cn.hutool.http.HtmlUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
-import com.nb6868.onex.common.auth.LoginForm;
 import com.nb6868.onex.common.filter.xss.XssUtils;
-import com.nb6868.onex.common.pojo.Const;
-import com.nb6868.onex.common.pojo.EncryptForm;
+import com.nb6868.onex.common.pojo.EncryptReq;
 import com.nb6868.onex.common.util.JacksonUtils;
 import com.nb6868.onex.common.util.PasswordUtils;
 import com.nb6868.onex.common.util.SignUtils;
@@ -69,7 +66,7 @@ public class StringTest {
     void aesEncodeTest() {
         String raw = "{\"password\":\"admin\",\"tenantCode\": \"xxx\",\"type\":\"ADMIN_USERNAME_PASSWORD\",\"username\":\"admin\"}";
         String content = SecureUtil.aes(Const.AES_KEY.getBytes()).encryptBase64(raw);
-        EncryptForm form = new EncryptForm();
+        EncryptReq form = new EncryptReq();
         form.setBody(content);
         log.error("form=" + form);
     }
@@ -78,7 +75,7 @@ public class StringTest {
     @DisplayName("aesDecode")
     void aesDecodeTest() {
         String raw = "bqJOFdO/IlOCMHJ6V+BDpyVlY1N5opy5uOrww4u/6huTIK7XB5WVAGiYflVn5AmzeLCpaiXQxUorBW3P05kexppCz3Y8uSi7W7NpWWWc7wY3OOT4aLKLZwylNiorEz5S";
-        EncryptForm form = new EncryptForm();
+        EncryptReq form = new EncryptReq();
         form.setBody(raw);
         String json = SecureUtil.aes(Const.AES_KEY.getBytes()).decryptStr(form.getBody());
         log.error("json=" + json);
@@ -243,13 +240,13 @@ public class StringTest {
                 .set("a", 100.3)
                 .set("b", 45)
                 .set("c", -199.100);
-        LoginForm loginForm = new LoginForm();
+       /* LoginForm loginForm = new LoginForm();
         loginForm.setType("sss");
         loginForm.setSms("sms2232");
         final Object eval = engine.eval("#a-(#b-#c)", dict, null);
         final Object eval2 = BeanUtil.getProperty(loginForm, "sms");
         log.error("eval={}", eval);
-        log.error("eval2={}", eval2);
+        log.error("eval2={}", eval2);*/
     }
 
     @Test

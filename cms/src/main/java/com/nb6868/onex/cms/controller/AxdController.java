@@ -1,14 +1,14 @@
 package com.nb6868.onex.cms.controller;
 
 import com.nb6868.onex.cms.dto.AxdDTO;
-import com.nb6868.onex.cms.dto.AxdQueryForm;
+import com.nb6868.onex.cms.dto.AxdQueryReq;
 import com.nb6868.onex.cms.service.AxdService;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdReq;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -43,7 +43,7 @@ public class AxdController {
     @Operation(summary = "列表")
     @RequiresPermissions("cms:axd:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> list(@Validated @RequestBody AxdQueryForm form) {
+    public Result<?> list(@Validated @RequestBody AxdQueryReq form) {
         List<?> list = axdService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -53,7 +53,7 @@ public class AxdController {
     @Operation(summary = "分页")
     @RequiresPermissions("cms:axd:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody AxdQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody AxdQueryReq form) {
         PageData<?> page = axdService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -63,7 +63,7 @@ public class AxdController {
     @Operation(summary = "信息")
     @RequiresPermissions("cms:axd:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         AxdDTO data = axdService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -97,7 +97,7 @@ public class AxdController {
     @LogOperation("删除")
     @RequiresPermissions("cms:axd:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         axdService.removeById(form.getId());
 
         return new Result<>();
@@ -108,7 +108,7 @@ public class AxdController {
     @LogOperation("批量删除")
     @RequiresPermissions("cms:axd:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
         axdService.removeByIds(form.getIds());
 
         return new Result<>();

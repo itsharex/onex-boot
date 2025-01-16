@@ -3,17 +3,16 @@ package com.nb6868.onex.uc.service;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.nb6868.onex.common.auth.AuthProps;
-import com.nb6868.onex.common.auth.LoginForm;
-import com.nb6868.onex.common.auth.UserLoginForm;
+import com.nb6868.onex.common.pojo.LoginByMobileSmsReq;
+import com.nb6868.onex.common.pojo.LoginByUsernamePasswordReq;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.log.BaseLogService;
 import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.pojo.ChangeStateForm;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.PasswordUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.ValidatorUtils;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +42,7 @@ public class AuthService {
      * @param loginParams 登录参数
      * @return 登录用户
      */
-    public UserEntity loginByUsernamePassword(UserLoginForm form, JSONObject loginParams) {
-        // 校验表单
-        ValidatorUtils.validateEntity(form, LoginForm.UsernamePasswordGroup.class);
+    public UserEntity loginByUsernamePassword(LoginByUsernamePasswordReq form, JSONObject loginParams) {
         // 获得用户
         UserEntity user = userService.getByUsername(form.getTenantCode(), form.getUsername());
         // 这里存在一个争论点，是否要将具体的信息告知用户
@@ -83,20 +80,18 @@ public class AuthService {
 
     /**
      * 手机号验证码登录
-     * @param form 登录请求
+     * @param req 登录请求
      * @param loginParams 登录参数
      * @return 登录用户
      */
-    public UserEntity loginByMobileSms(LoginForm form, JSONObject loginParams) {
-        // 校验参数
-        ValidatorUtils.validateEntity(form, LoginForm.MobileSmsGroup.class);
+    public UserEntity loginByMobileSms(LoginByMobileSmsReq req, JSONObject loginParams) {
         // 获得用户
-        UserEntity user = userService.getByMobile(form.getTenantCode(), form.getMobile());
+        UserEntity user = userService.getByMobile(req.getTenantCode(), req.getMobile());
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR);
         // 判断用户状态
         AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
         // 验证并将短信消费掉
-        msgService.verifyMailCode(form.getTenantCode(), loginParams.getStr("mailTplCode", "CODE_LOGIN"), form.getMobile(), form.getSms());
+        msgService.verifyMailCode(req.getTenantCode(), loginParams.getStr("mailTplCode", "CODE_LOGIN"), req.getMobile(), req.getSms());
         return user;
     }
 }

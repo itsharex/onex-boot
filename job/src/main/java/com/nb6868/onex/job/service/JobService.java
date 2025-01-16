@@ -13,7 +13,7 @@ import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.job.JobConst;
 import com.nb6868.onex.job.dao.JobDao;
 import com.nb6868.onex.job.dto.JobDTO;
-import com.nb6868.onex.job.dto.JobRunWithParamsForm;
+import com.nb6868.onex.job.dto.JobRunWithParamsReq;
 import com.nb6868.onex.job.entity.JobEntity;
 import com.nb6868.onex.job.entity.JobLogEntity;
 import com.nb6868.onex.job.sched.AbstractJobRunService;
@@ -49,7 +49,7 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
      * 立即执行
      */
     @Transactional(rollbackFor = Exception.class)
-    public void runWithParams(JobRunWithParamsForm form) {
+    public void runWithParams(JobRunWithParamsReq form) {
         JobEntity job = getById(form.getId());
         AssertUtils.isNull(job, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 忽略是否停止

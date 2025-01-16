@@ -8,8 +8,8 @@ import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.tunnel.form.DbForm;
-import com.nb6868.onex.tunnel.form.DbQueryForm;
+import com.nb6868.onex.tunnel.dto.DbReq;
+import com.nb6868.onex.tunnel.dto.DbQueryReq;
 import com.zaxxer.hikari.HikariDataSource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ public class DbController {
     @PostMapping("query")
     @Operation(summary = "数据查询")
     @AccessControl(value = "/query", allowTokenName = "token-tunnel")
-    public Result<?> query(@Validated @RequestBody DbQueryForm form) {
+    public Result<?> query(@Validated @RequestBody DbQueryReq form) {
         // init 数据源
         DataSource ds = initDataSource(form);
         // 执行数据查询
@@ -45,7 +45,7 @@ public class DbController {
     @PostMapping("execute")
     @Operation(summary = "数据执行")
     @AccessControl(value = "/execute", allowTokenName = "token-tunnel")
-    public Result<?> execute(@Validated @RequestBody DbQueryForm form) {
+    public Result<?> execute(@Validated @RequestBody DbQueryReq form) {
         // init 数据源
         DataSource ds = initDataSource(form);
         // 执行数据查询
@@ -60,7 +60,7 @@ public class DbController {
     /**
      * 初始化数据源
      */
-    private DataSource initDataSource(DbForm form) {
+    private DataSource initDataSource(DbReq form) {
         // 检查输入
         AssertUtils.isTrue((StrUtil.isEmpty(form.getDs()) && StrUtil.hasBlank(form.getUrl(), form.getUsername(), form.getPassword())), "请指定数据源");
         try {

@@ -18,17 +18,17 @@ import com.nb6868.onex.common.oss.OssFactory;
 import com.nb6868.onex.common.oss.OssPropsConfig;
 import com.nb6868.onex.common.params.BaseParamsService;
 import com.nb6868.onex.common.pojo.ApiResult;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.util.MultipartFileUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.sys.SysConst;
-import com.nb6868.onex.sys.dto.OssFileBase64UploadForm;
-import com.nb6868.onex.sys.dto.OssPreSignedForm;
-import com.nb6868.onex.sys.dto.OssQueryForm;
-import com.nb6868.onex.sys.dto.OssSignedPostForm;
+import com.nb6868.onex.sys.dto.OssFileBase64UploadReq;
+import com.nb6868.onex.sys.dto.OssPreSignedReq;
+import com.nb6868.onex.sys.dto.OssQueryReq;
+import com.nb6868.onex.sys.dto.OssSignedPostReq;
 import com.nb6868.onex.sys.entity.OssEntity;
 import com.nb6868.onex.sys.service.OssService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -151,7 +151,7 @@ public class OssController {
     @Operation(summary = "匿名上传单文件(base64)", description = "不再提供匿名,有需要手动放行")
     // @AccessControl
     @ApiOperationSupport(order = 30)
-    public Result<?> anonUploadBase64(@Validated @RequestBody OssFileBase64UploadForm form) {
+    public Result<?> anonUploadBase64(@Validated @RequestBody OssFileBase64UploadReq form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
@@ -176,7 +176,7 @@ public class OssController {
     @PostMapping("uploadBase64")
     @Operation(summary = "上传单文件(base64)")
     @ApiOperationSupport(order = 40)
-    public Result<?> uploadBase64(@Validated @RequestBody OssFileBase64UploadForm form) {
+    public Result<?> uploadBase64(@Validated @RequestBody OssFileBase64UploadReq form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
@@ -276,7 +276,7 @@ public class OssController {
     @Operation(summary = "获得已签名的post表单参数")
     @ApiOperationSupport(order = 70)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:oss"}, logical = Logical.OR)
-    public Result<?> getSignedPostForm(@Validated @RequestBody OssSignedPostForm form) {
+    public Result<?> getSignedPostForm(@Validated @RequestBody OssSignedPostReq form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
@@ -289,7 +289,7 @@ public class OssController {
     @PostMapping("getPreSignedPostForm")
     @Operation(summary = "获得已签名的post表单参数")
     @ApiOperationSupport(order = 80)
-    public Result<?> getPreSignedPostForm(@Validated @RequestBody OssPreSignedForm form) {
+    public Result<?> getPreSignedPostForm(@Validated @RequestBody OssPreSignedReq form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
@@ -303,7 +303,7 @@ public class OssController {
     @PostMapping("getPreSignedUrl")
     @Operation(summary = "获得授权访问地址")
     @ApiOperationSupport(order = 70)
-    public Result<?> getPreSignedUrl(@Validated @RequestBody OssPreSignedForm form) {
+    public Result<?> getPreSignedUrl(@Validated @RequestBody OssPreSignedReq form) {
         OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
@@ -319,7 +319,7 @@ public class OssController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:oss", "sys:oss:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 100)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody OssQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody OssQueryReq form) {
         PageData<?> page = ossService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -330,7 +330,7 @@ public class OssController {
     @LogOperation("批量删除")
     @ApiOperationSupport(order = 110)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:oss", "sys:oss:delete"}, logical = Logical.OR)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
         ossService.removeByIds(form.getIds());
 
         return new Result<>();

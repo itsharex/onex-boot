@@ -5,7 +5,7 @@ import com.nb6868.onex.cms.dao.AxdDao;
 import com.nb6868.onex.cms.dto.AxdDTO;
 import com.nb6868.onex.cms.entity.AxdEntity;
 import com.nb6868.onex.common.jpa.DtoService;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.WrapperUtils;
 import org.springframework.stereotype.Service;
 

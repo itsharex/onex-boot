@@ -1,21 +1,15 @@
 package com.nb6868.onex.sys.service;
 
-import cn.hutool.core.map.MapUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nb6868.onex.sys.dao.DictDao;
 import com.nb6868.onex.sys.dto.DictDTO;
 import com.nb6868.onex.sys.entity.DictEntity;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.jpa.DtoService;
-import com.nb6868.onex.common.util.WrapperUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import static com.nb6868.onex.common.pojo.Const.LIMIT_ONE;
+import static com.nb6868.onex.common.Const.LIMIT_ONE;
 
 /**
  * 数据字典

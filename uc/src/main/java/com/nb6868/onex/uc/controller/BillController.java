@@ -58,7 +58,7 @@ public class BillController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions("uc:bill:info")
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         BillDTO data = billService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -89,7 +89,7 @@ public class BillController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions("uc:bill:delete")
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         billService.removeById(form.getId());
 
         return new Result<>();

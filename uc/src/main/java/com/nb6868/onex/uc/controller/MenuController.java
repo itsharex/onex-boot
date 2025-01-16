@@ -8,7 +8,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.util.TreeNodeUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -16,7 +16,7 @@ import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.MenuDTO;
-import com.nb6868.onex.uc.dto.MenuQueryForm;
+import com.nb6868.onex.uc.dto.MenuQueryReq;
 import com.nb6868.onex.uc.entity.MenuEntity;
 import com.nb6868.onex.uc.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +49,7 @@ public class MenuController {
     @Operation(summary = "树列表", description = "按租户来,不做用户的权限区分")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:query"}, logical = Logical.OR)
-    public Result<?> tree(@Validated @RequestBody MenuQueryForm form) {
+    public Result<?> tree(@Validated @RequestBody MenuQueryReq form) {
         QueryWrapper<MenuEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         List<TreeNode<Long>> menuList = new ArrayList<>();
         menuService.list(queryWrapper).forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create().set("permissions", menu.getPermissions()).set("type", menu.getType()).set("icon", menu.getIcon()).set("url", menu.getUrl()).set("urlNewBlank", menu.getUrlNewBlank()))));
@@ -61,7 +61,7 @@ public class MenuController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         MenuDTO data = menuService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 赋值父菜单
@@ -96,7 +96,7 @@ public class MenuController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:delete"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据
         MenuEntity data = menuService.getOne(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);

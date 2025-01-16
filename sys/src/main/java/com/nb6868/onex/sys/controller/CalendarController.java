@@ -8,8 +8,8 @@ import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.sys.dto.CalendarDTO;
-import com.nb6868.onex.sys.dto.CalenderDayDateForm;
-import com.nb6868.onex.sys.dto.CalenderQueryForm;
+import com.nb6868.onex.sys.dto.CalenderDayDateReq;
+import com.nb6868.onex.sys.dto.CalenderQueryReq;
 import com.nb6868.onex.sys.entity.CalendarEntity;
 import com.nb6868.onex.sys.service.CalendarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +34,7 @@ public class CalendarController {
     @PostMapping("list")
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:calendar", "sys:calendar:query"}, logical = Logical.OR)
-    public Result<?> list(@Validated @RequestBody CalenderQueryForm form) {
+    public Result<?> list(@Validated @RequestBody CalenderQueryReq form) {
         QueryWrapper<CalendarEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "list");
         List<CalendarDTO> list = calendarService.listDto(queryWrapper);
 
@@ -44,7 +44,7 @@ public class CalendarController {
     @PostMapping("page")
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:calendar", "sys:calendar:query"}, logical = Logical.OR)
-    public Result<?> page(@Validated(PageGroup.class) @RequestBody CalenderQueryForm form) {
+    public Result<?> page(@Validated(PageGroup.class) @RequestBody CalenderQueryReq form) {
         QueryWrapper<CalendarEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "page");
         PageData<CalendarDTO> page = calendarService.pageDto(form, queryWrapper);
 
@@ -54,7 +54,7 @@ public class CalendarController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:calendar", "sys:calendar:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody CalenderDayDateForm form) {
+    public Result<?> info(@Validated @RequestBody CalenderDayDateReq form) {
         CalendarDTO data = calendarService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 

@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.sys.dto.LogDTO;
-import com.nb6868.onex.sys.dto.LogQueryForm;
+import com.nb6868.onex.sys.dto.LogQueryReq;
 import com.nb6868.onex.sys.entity.LogEntity;
 import com.nb6868.onex.sys.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ public class LogController {
     @Operation(summary = "分页")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:query"}, logical = Logical.OR)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody LogQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody LogQueryReq form) {
         QueryWrapper<LogEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "page");
         PageData<LogDTO> page = logService.pageDto(form, queryWrapper);
 
@@ -47,7 +47,7 @@ public class LogController {
     @Operation(summary = "批量删除")
     @LogOperation("批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:delete"}, logical = Logical.OR)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
         logService.removeByIds(form.getIds());
 
         return new Result<>();

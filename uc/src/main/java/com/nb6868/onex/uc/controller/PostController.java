@@ -5,7 +5,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -14,7 +14,7 @@ import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.PostDTO;
-import com.nb6868.onex.uc.dto.PostQueryForm;
+import com.nb6868.onex.uc.dto.PostQueryReq;
 import com.nb6868.onex.uc.entity.PostEntity;
 import com.nb6868.onex.uc.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +44,7 @@ public class PostController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 10)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody PostQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody PostQueryReq form) {
         PageData<?> page = postService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -55,7 +55,7 @@ public class PostController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 20)
-    public Result<?> list(@Validated @RequestBody PostQueryForm form) {
+    public Result<?> list(@Validated @RequestBody PostQueryReq form) {
         List<?> list = postService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -66,7 +66,7 @@ public class PostController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 30)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         PostDTO data = postService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -101,7 +101,7 @@ public class PostController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据是否存在
         PostEntity data = postService.getOne(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.params.BaseParamsService;
 import com.nb6868.onex.common.params.ParamsProps;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.JacksonUtils;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dao.ParamsDao;

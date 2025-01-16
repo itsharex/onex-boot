@@ -1,14 +1,14 @@
 package com.nb6868.onex.cms.controller;
 
 import com.nb6868.onex.cms.dto.ArticleDTO;
-import com.nb6868.onex.cms.dto.ArticleQueryForm;
+import com.nb6868.onex.cms.dto.ArticleQueryReq;
 import com.nb6868.onex.cms.service.ArticleService;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdReq;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -46,7 +46,7 @@ public class ArticleController {
     @Operation(summary = "列表")
     @RequiresPermissions("cms:article:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> list(@Validated @RequestBody ArticleQueryForm form) {
+    public Result<?> list(@Validated @RequestBody ArticleQueryReq form) {
         List<?> list = articleService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -55,7 +55,7 @@ public class ArticleController {
     @PostMapping("page")
     @Operation(summary = "分页")
     @RequiresPermissions("cms:article:query")
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ArticleQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody ArticleQueryReq form) {
         PageData<?> page = articleService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -65,7 +65,7 @@ public class ArticleController {
     @Operation(summary = "信息")
     @RequiresPermissions("cms:article:query")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         ArticleDTO data = articleService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -98,7 +98,7 @@ public class ArticleController {
     @LogOperation("删除")
     @RequiresPermissions("cms:article:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         articleService.removeById(form.getId());
 
         return new Result<>();
@@ -109,7 +109,7 @@ public class ArticleController {
     @LogOperation("批量删除")
     @RequiresPermissions("cms:article:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
         articleService.removeByIds(form.getIds());
 
         return new Result<>();

@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.pojo.ChangeStateForm;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.shiro.ShiroDao;
 import com.nb6868.onex.common.shiro.ShiroUser;
 import com.nb6868.onex.common.shiro.ShiroUtils;

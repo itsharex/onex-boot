@@ -34,7 +34,7 @@ public class SseController {
     @Operation(summary = "发送单点消息")
     @RequiresPermissions(value = {"admin:super", "admin:sse", "sys:sse:send"}, logical = Logical.OR)
     @ApiOperationSupport(order = 20)
-    public Result<?> sendOneMessage(@Validated(value = {DefaultGroup.class, SseSendForm.SendOneGroup.class}) @RequestBody SseSendForm form) {
+    public Result<?> sendOneMessage(@Validated(value = {DefaultGroup.class, SseSendReq.SendOneGroup.class}) @RequestBody SseSendReq form) {
         sseEmitterService.sendOneMessage(form.getSid(), JSONUtil.parseObj(form.getContent()));
         return new Result<>();
     }

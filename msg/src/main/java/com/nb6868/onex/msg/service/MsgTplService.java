@@ -3,7 +3,7 @@ package com.nb6868.onex.msg.service;
 import cn.hutool.core.util.StrUtil;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.msg.dao.MsgTplDao;
 import com.nb6868.onex.msg.dto.MsgTplDTO;

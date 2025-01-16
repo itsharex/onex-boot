@@ -6,8 +6,8 @@ import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.msg.MsgSendForm;
-import com.nb6868.onex.common.pojo.IdForm;
-import com.nb6868.onex.common.pojo.IdsForm;
+import com.nb6868.onex.common.pojo.IdReq;
+import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -15,9 +15,9 @@ import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
-import com.nb6868.onex.msg.dto.MsgLogQueryForm;
+import com.nb6868.onex.msg.dto.MsgLogQueryReq;
 import com.nb6868.onex.msg.dto.MsgTplDTO;
-import com.nb6868.onex.msg.dto.MsgTplQueryForm;
+import com.nb6868.onex.msg.dto.MsgTplQueryReq;
 import com.nb6868.onex.msg.service.MsgLogService;
 import com.nb6868.onex.msg.service.MsgService;
 import com.nb6868.onex.msg.service.MsgTplService;
@@ -52,7 +52,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 20)
-    public Result<?> tplPage(@Validated({PageGroup.class}) @RequestBody MsgTplQueryForm form) {
+    public Result<?> tplPage(@Validated({PageGroup.class}) @RequestBody MsgTplQueryReq form) {
         PageData<?> page = msgTplService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -63,7 +63,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 10)
-    public Result<?> tplList(@Validated @RequestBody MsgTplQueryForm form) {
+    public Result<?> tplList(@Validated @RequestBody MsgTplQueryReq form) {
         List<?> list = msgTplService.listDto(QueryWrapperHelper.getPredicate(form));
         return new Result<>().success(list);
     }
@@ -73,7 +73,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 30)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         MsgTplDTO data = msgTplService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -108,7 +108,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         msgTplService.removeById(form.getId());
 
         return new Result<>();
@@ -119,7 +119,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgLog:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 100)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody MsgLogQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody MsgLogQueryReq form) {
         PageData<?> page = msgLogService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -141,7 +141,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgLog:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 50)
-    public Result<?> logDeleteBatch(@Validated @RequestBody IdsForm form) {
+    public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq form) {
         msgLogService.removeByIds(form.getIds());
 
         return new Result<>();

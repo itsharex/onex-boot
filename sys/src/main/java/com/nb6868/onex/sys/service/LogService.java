@@ -6,7 +6,7 @@ import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.log.BaseLogService;
 import com.nb6868.onex.common.log.LogBody;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.sys.dao.LogDao;
 import com.nb6868.onex.sys.dto.LogDTO;

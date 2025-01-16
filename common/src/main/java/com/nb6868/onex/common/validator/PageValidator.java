@@ -1,6 +1,6 @@
 package com.nb6868.onex.common.validator;
 
-import com.nb6868.onex.common.pojo.PageForm;
+import com.nb6868.onex.common.pojo.PageReq;
 import org.hibernate.validator.HibernateValidator;
 
 import jakarta.validation.ConstraintValidator;
@@ -20,7 +20,7 @@ public class PageValidator implements ConstraintValidator<Page, Object> {
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if (!(value instanceof PageForm)) {
+        if (!(value instanceof PageReq)) {
             return false;
         }
         return getValidateResult(value);

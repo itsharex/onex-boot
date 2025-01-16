@@ -3,12 +3,10 @@ package com.nb6868.onex.common.pojo;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.util.MessageUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -20,8 +18,7 @@ import java.time.Instant;
  */
 @Data
 @Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;

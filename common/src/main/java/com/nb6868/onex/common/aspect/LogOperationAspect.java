@@ -4,10 +4,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.nb6868.onex.common.annotation.LogOperation;
-import com.nb6868.onex.common.auth.LoginForm;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.log.BaseLogService;
@@ -108,12 +108,12 @@ public class LogOperationAspect {
         if ("login".equalsIgnoreCase(logType)) {
             // 登录日志
             try {
-                LoginForm loginForm = JSONUtil.toBean(params, LoginForm.class);
-                logEntity.setTenantCode(loginForm.getTenantCode());
-                if (loginForm.getType().endsWith("USERNAME_PASSWORD")) {
-                    logEntity.setCreateName(loginForm.getUsername());
-                } else if (loginForm.getType().endsWith("MOBILE_SMS")) {
-                    logEntity.setCreateName(loginForm.getMobile());
+                JSONObject loginForm = JSONUtil.parseObj(params);
+                logEntity.setTenantCode(loginForm.getStr("tenantCode"));
+                if (StrUtil.endWith(loginForm.getStr("type"), "USERNAME_PASSWORD")) {
+                    logEntity.setCreateName(loginForm.getStr("username"));
+                } else if (StrUtil.endWith(loginForm.getStr("type"), "MOBILE_SMS")) {
+                    logEntity.setCreateName(loginForm.getStr("mobile"));
                 }
             } catch (Exception e2) {
                 log.error("LogOperationAspect setCreateName error", e2);

@@ -8,7 +8,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.extra.template.engine.freemarker.FreemarkerEngine;
 import cn.hutool.json.JSONObject;
 import com.nb6868.onex.common.msg.MsgSendForm;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.MultipartFileUtils;
 import com.nb6868.onex.common.util.TemplateUtils;
 import com.nb6868.onex.common.validator.AssertUtils;

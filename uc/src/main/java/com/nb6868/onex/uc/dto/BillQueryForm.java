@@ -1,7 +1,7 @@
 package com.nb6868.onex.uc.dto;
 
 import com.nb6868.onex.common.jpa.Query;
-import com.nb6868.onex.common.pojo.PageForm;
+import com.nb6868.onex.common.pojo.PageReq;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Schema(name = "参数查询")
-public class BillQueryForm extends PageForm {
+public class BillQueryForm extends PageReq {
 
     @Query
     @Schema(description = "用户ID")

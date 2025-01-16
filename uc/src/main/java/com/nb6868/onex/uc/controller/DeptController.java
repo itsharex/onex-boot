@@ -9,7 +9,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.util.TreeNodeUtils;
@@ -19,7 +19,7 @@ import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.DeptDTO;
-import com.nb6868.onex.uc.dto.DeptQueryForm;
+import com.nb6868.onex.uc.dto.DeptQueryReq;
 import com.nb6868.onex.uc.entity.DeptEntity;
 import com.nb6868.onex.uc.service.DeptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class DeptController {
     @Operation(summary = "树表")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:query"}, logical = Logical.OR)
-    public Result<?> tree(@Validated @RequestBody DeptQueryForm form) {
+    public Result<?> tree(@Validated @RequestBody DeptQueryReq form) {
         QueryWrapper<DeptEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         List<Tree<String>> treeList = TreeNodeUtils.buildCodeTree(
                 CollStreamUtil.toList(deptService.list(queryWrapper),
@@ -56,7 +56,7 @@ public class DeptController {
     @PostMapping("list")
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:query"}, logical = Logical.OR)
-    public Result<?> list(@Validated @RequestBody DeptQueryForm form) {
+    public Result<?> list(@Validated @RequestBody DeptQueryReq form) {
         List<?> list = deptService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -65,7 +65,7 @@ public class DeptController {
     @PostMapping("page")
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:query"}, logical = Logical.OR)
-    public Result<?> page(@Validated(PageGroup.class) @RequestBody DeptQueryForm form) {
+    public Result<?> page(@Validated(PageGroup.class) @RequestBody DeptQueryReq form) {
         PageData<?> page = deptService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -74,7 +74,7 @@ public class DeptController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         DeptDTO data = deptService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -105,7 +105,7 @@ public class DeptController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         deptService.removeById(form.getId());
 
         return new Result<>();

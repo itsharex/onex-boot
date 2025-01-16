@@ -8,7 +8,7 @@ import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.ChangeStateForm;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.shiro.ShiroUtils;
@@ -18,7 +18,7 @@ import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.UserDTO;
-import com.nb6868.onex.uc.dto.UserQueryForm;
+import com.nb6868.onex.uc.dto.UserQueryReq;
 import com.nb6868.onex.uc.entity.UserEntity;
 import com.nb6868.onex.uc.service.DeptService;
 import com.nb6868.onex.uc.service.RoleService;
@@ -56,7 +56,7 @@ public class UserController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 10)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody UserQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody UserQueryReq form) {
         QueryWrapper<UserEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "page");
         if (CollUtil.isNotEmpty(form.getRoleCodes())) {
             List<Long> userIds = roleService.getUserIdListByRoleCodeList(form.getRoleCodes());
@@ -80,7 +80,7 @@ public class UserController {
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> list(@Validated @RequestBody UserQueryForm form) {
+    public Result<?> list(@Validated @RequestBody UserQueryReq form) {
         QueryWrapper<UserEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "list");
         if (CollUtil.isNotEmpty(form.getRoleCodes())) {
             List<Long> userIds = roleService.getUserIdListByRoleCodeList(form.getRoleCodes());
@@ -104,7 +104,7 @@ public class UserController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdForm form) {
+    public Result<?> info(@Validated @RequestBody IdReq form) {
         UserDTO data = userService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 用户角色列表
@@ -159,7 +159,7 @@ public class UserController {
     @Operation(summary = "删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:delete"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据是否存在
         UserEntity data = userService.getOne(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);

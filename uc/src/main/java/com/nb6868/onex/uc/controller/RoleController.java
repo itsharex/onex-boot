@@ -5,17 +5,16 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.IdForm;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
-import com.nb6868.onex.common.pojo.StringIdForm;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.RoleDTO;
-import com.nb6868.onex.uc.dto.RoleQueryForm;
+import com.nb6868.onex.uc.dto.RoleQueryReq;
 import com.nb6868.onex.uc.service.MenuScopeService;
 import com.nb6868.onex.uc.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +46,7 @@ public class RoleController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 10)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody RoleQueryForm form) {
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody RoleQueryReq form) {
         PageData<?> page = roleService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
         return new Result<>().success(page);
@@ -58,7 +57,7 @@ public class RoleController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @ApiOperationSupport(order = 20)
-    public Result<?> list(@Validated @RequestBody RoleQueryForm form) {
+    public Result<?> list(@Validated @RequestBody RoleQueryReq form) {
         List<?> list = roleService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
         return new Result<>().success(list);
@@ -69,8 +68,8 @@ public class RoleController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @ApiOperationSupport(order = 30)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody StringIdForm form) {
-        RoleDTO data = roleService.oneDto(QueryWrapperHelper.getPredicate(form));
+    public Result<?> info(@Validated @RequestBody IdReq req) {
+        RoleDTO data = roleService.oneDto(QueryWrapperHelper.getPredicate(req));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
         // 查询角色对应的菜单
@@ -108,7 +107,7 @@ public class RoleController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdForm form) {
+    public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据是否存在
         AssertUtils.isFalse(roleService.hasIdRecord(form.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         // 删除

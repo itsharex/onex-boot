@@ -14,7 +14,7 @@ import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.msg.MsgLogBody;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.msg.MsgTplBody;
-import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.msg.MsgConst;
