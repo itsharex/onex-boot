@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.3.7] 2025.01.16
+- upgrade: upgrade aws-s3 to 2.29.52
+- upgrade: upgrade mybatis-plus to 3.5.10.1
+
 ## [4.3.6] 2025.01.13
 - upgrade: upgrade hutool to 5.8.35
 - upgrade: upgrade aws-s3 to 2.29.50
