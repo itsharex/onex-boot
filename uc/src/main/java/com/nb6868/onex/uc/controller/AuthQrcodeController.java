@@ -1,32 +1,7 @@
 package com.nb6868.onex.uc.controller;
 
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
-import com.nb6868.onex.common.annotation.AccessControl;
-import com.nb6868.onex.common.auth.*;
-import com.nb6868.onex.common.exception.ErrorCode;
-import com.nb6868.onex.common.pojo.CodeForm;
-import com.nb6868.onex.common.pojo.Result;
-import com.nb6868.onex.common.util.*;
-import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
-import com.nb6868.onex.uc.UcConst;
-import com.nb6868.onex.uc.dto.*;
-import com.nb6868.onex.uc.entity.UserEntity;
-import com.nb6868.onex.uc.service.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+/*
+@Deprecated
 @RestController
 @RequestMapping("/uc/auth/qrcode/")
 @AccessControl
@@ -125,4 +100,4 @@ public class AuthQrcodeController {
         }
     }
 
-}
+}*/

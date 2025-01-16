@@ -174,13 +174,14 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
      *
      * @param id          用户ID
      * @param newPassword 新密码
+     * @param passwordStoreKey 密码可逆加密的key
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean updatePassword(Long id, String newPassword) {
+    public boolean updatePassword(Long id, String newPassword, String passwordStoreKey) {
         return lambdaUpdate()
                 .eq(UserEntity::getId, id)
                 .set(UserEntity::getPassword, PasswordUtils.encode(newPassword))
-                .set(UserEntity::getPasswordRaw, PasswordUtils.aesEncode(newPassword, Const.AES_KEY))
+                .set(StrUtil.isNotBlank(passwordStoreKey), UserEntity::getPasswordRaw, PasswordUtils.aesEncode(newPassword, passwordStoreKey))
                 .update(new UserEntity());
     }
 

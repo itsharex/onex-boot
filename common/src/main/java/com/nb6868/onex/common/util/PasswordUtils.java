@@ -32,12 +32,12 @@ public class PasswordUtils {
 
     /**
      * 可逆AES加密
-     * @param raw 明文
+     * @param plaintext 明文
      * @param key aes密钥
      * @return 密文
      */
-    public static String aesEncode(String raw, String key) {
-        return SecureUtil.aes(key.getBytes()).encryptBase64(raw);
+    public static String aesEncode(String plaintext, String key) {
+        return SecureUtil.aes(key.getBytes()).encryptBase64(plaintext);
     }
 
     /**
@@ -53,22 +53,22 @@ public class PasswordUtils {
     /**
      * 加密
      *
-     * @param raw 字符串
+     * @param plaintext 字符串
      * @return 返回加密字符串
      */
-    public static String encode(String raw) {
-        return encode(raw, "bcrypt");
+    public static String encode(String plaintext) {
+        return encode(plaintext, "bcrypt");
     }
 
     /**
      * 比较密码是否相等
      *
-     * @param raw     明文密码
+     * @param plaintext     明文密码
      * @param encoded 加密后密码
      * @return 匹配结果
      */
-    public static boolean verify(String raw, String encoded) {
-        return verify(raw, encoded, "bcrypt");
+    public static boolean verify(String plaintext, String encoded) {
+        return verify(plaintext, encoded, "bcrypt");
     }
 
     /**

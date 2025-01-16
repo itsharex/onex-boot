@@ -6,21 +6,19 @@ import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.auth.*;
 import com.nb6868.onex.common.exception.ErrorCode;
-import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.msg.MsgLogBody;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.msg.MsgTplBody;
-import com.nb6868.onex.common.pojo.BaseForm;
-import com.nb6868.onex.common.pojo.Const;
-import com.nb6868.onex.common.pojo.EncryptForm;
-import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.pojo.*;
 import com.nb6868.onex.common.shiro.ShiroUser;
 import com.nb6868.onex.common.shiro.ShiroUtils;
 import com.nb6868.onex.common.util.*;
@@ -28,7 +26,10 @@ import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.ValidatorUtils;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.uc.UcConst;
-import com.nb6868.onex.uc.dto.*;
+import com.nb6868.onex.uc.dto.MenuResult;
+import com.nb6868.onex.uc.dto.MenuScopeForm;
+import com.nb6868.onex.uc.dto.MenuScopeResult;
+import com.nb6868.onex.uc.dto.UserDTO;
 import com.nb6868.onex.uc.entity.UserEntity;
 import com.nb6868.onex.uc.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/uc/auth/")
@@ -67,6 +71,8 @@ public class AuthController {
     AuthService authService;
     @Autowired
     BaseMsgService msgService;
+    @Autowired
+    RoleUserService roleUserService;
 
     @PostMapping("captcha")
     @AccessControl
@@ -87,6 +93,101 @@ public class AuthController {
         // 将uuid和图片base64返回给前端
         JSONObject result = new JSONObject().set("uuid", uuid).set("image", captchaBase64);
         return new Result<>().success(result);
+    }
+
+    @PostMapping("userLogin")
+    @AccessControl
+    @Operation(summary = "用户账号登录", description = "Anon")
+    @LogOperation(value = "用户账号登录", type = "login")
+    @ApiOperationSupport(order = 20)
+    public Result<?> userLogin(@Validated(value = {DefaultGroup.class}) @RequestBody UserLoginForm form) {
+        // 获得对应登录类型的登录参数
+        JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
+        AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
+        // 验证验证码
+        if (loginParams.getBool("captcha", false)) {
+            // 先检验验证码表单
+            ValidatorUtils.validateEntity(form, LoginForm.CaptchaGroup.class);
+            // 再校验验证码与魔术验证码不同，并且 校验失败
+            AssertUtils.isTrue(!form.getCaptchaValue().equalsIgnoreCase(loginParams.getStr("magicCaptcha")) && !captchaService.validate(form.getCaptchaUuid(), form.getCaptchaValue()), ErrorCode.CAPTCHA_ERROR);
+        }
+        UserEntity user = authService.loginByUsernamePassword(form, loginParams);
+        // 创建token
+        String token = tokenService.createToken(user,
+                loginParams.getStr(AuthConst.TOKEN_STORE_TYPE_KEY, AuthConst.TOKEN_STORE_TYPE_VALUE),
+                form.getType(),
+                loginParams.getStr(AuthConst.TOKEN_JWT_KEY_KEY, AuthConst.TOKEN_JWT_KEY_VALUE),
+                loginParams.getInt(AuthConst.TOKEN_EXPIRE_KEY, AuthConst.TOKEN_EXPIRE_VALUE),
+                loginParams.getInt(AuthConst.TOKEN_LIMIT_KEY, AuthConst.TOKEN_LIMIT_VALUE));
+        // 登录成功
+        LoginResult loginResult = new LoginResult()
+                .setUser(ConvertUtils.sourceToTarget(user, UserDTO.class))
+                .setToken(token)
+                .setTokenKey(authProps.getTokenHeaderKey());
+        return new Result<>().success(loginResult);
+    }
+
+    @PostMapping("userLoginByDingtalkCode")
+    @AccessControl
+    @Operation(summary = "钉钉免密code登录", description = "Anon")
+    @LogOperation(value = "钉钉免密code登录", type = "login")
+    @ApiOperationSupport(order = 30)
+    public Result<?> userLoginByCode(@Validated(value = {DefaultGroup.class}) @RequestBody CodeLoginForm form) {
+        // 获得对应登录类型的登录参数
+        JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
+        AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
+        AssertUtils.isTrue(StrUtil.hasBlank(loginParams.getStr("appId"), loginParams.getStr("appSecret")), "登录配置缺少appId和appSecret信息");
+
+        ApiResult<String> userAccessToken = DingTalkApi.getUserAccessToken(loginParams.getStr("appId"), loginParams.getStr("appSecret"), form.getCode());
+        AssertUtils.isTrue(userAccessToken.isSuccess(), userAccessToken.getMsg());
+        ApiResult<JSONObject> userContact = DingTalkApi.getUserContact(userAccessToken.getData(), "me");
+        AssertUtils.isTrue(userContact.isSuccess(), userContact.getMsg());
+        ApiResult<JSONObject> userIdResponse = DingTalkApi.getUserIdByUnionid(userAccessToken.getData(), userContact.getData().getStr("unionId"));
+        AssertUtils.isTrue(userIdResponse.isSuccess(), userIdResponse.getMsg());
+        // 封装自己的业务逻辑,比如用userId去找用户
+        UserEntity user = userService.query().eq("oauth_userid", userIdResponse.getData().getStr("userid")).last(Const.LIMIT_ONE).one();
+        if (user == null) {
+            // 不存在
+            if (loginParams.getBool("autoCreateUserEnable", false)) {
+                // 自动创建用户
+                user = new UserEntity();
+                user.setUsername(userContact.getData().getStr("nick"));
+                user.setRealName(userContact.getData().getStr("nick"));
+                user.setPassword(DigestUtil.bcrypt(userIdResponse.getData().getStr("userid")));
+                user.setPasswordRaw(PasswordUtils.aesEncode(userIdResponse.getData().getStr("userid"), Const.AES_KEY));
+                user.setOauthUserid(userIdResponse.getData().getStr("userid"));
+                user.setOauthInfo(JSONUtil.parseObj(userContact.getData()));
+                user.setMobile(userContact.getData().getStr("mobile"));
+                user.setAvatar(userContact.getData().getStr("avatarUrl"));
+                user.setType(UcConst.UserTypeEnum.DEPT_ADMIN.value());
+                user.setState(UcConst.UserStateEnum.ENABLED.value());
+                user.setTenantCode(form.getTenantCode());
+                AssertUtils.isTrue(userService.hasDuplicated(null, "username", user.getUsername()), ErrorCode.ERROR_REQUEST, "用户名已存在");
+                // AssertUtils.isTrue(userService.hasDuplicated(null, "mobile", user.getMobile()), ErrorCode.ERROR_REQUEST, "手机号已存在");
+                userService.save(user);
+                // 保存角色关系
+                roleUserService.saveOrUpdateByUserIdAndRoleIds(user.getId(), loginParams.getBeanList("autoCreateUserRoleIds", Long.class));
+            } else {
+                return new Result<>().error("用户未注册");
+            }
+        }
+        // 判断用户是否存在
+        AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
+        // 判断用户状态
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+        // 创建token
+        String token = tokenService.createToken(user,
+                loginParams.getStr(AuthConst.TOKEN_STORE_TYPE_KEY, AuthConst.TOKEN_STORE_TYPE_VALUE),
+                form.getType(),
+                loginParams.getStr(AuthConst.TOKEN_JWT_KEY_KEY, AuthConst.TOKEN_JWT_KEY_VALUE),
+                loginParams.getInt(AuthConst.TOKEN_EXPIRE_KEY, AuthConst.TOKEN_EXPIRE_VALUE),
+                loginParams.getInt(AuthConst.TOKEN_LIMIT_KEY, AuthConst.TOKEN_LIMIT_VALUE));
+        // 登录成功
+        LoginResult loginResult = new LoginResult()
+                .setUser(ConvertUtils.sourceToTarget(user, UserDTO.class))
+                .setToken(token)
+                .setTokenKey(authProps.getTokenHeaderKey());
+        return new Result<>().success(loginResult);
     }
 
     @PostMapping("sendMsgCode")
@@ -112,50 +213,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("userLogin")
-    @AccessControl
-    @Operation(summary = "用户登录", description = "Anon")
-    @LogOperation(value = "用户登录", type = "login")
-    @ApiOperationSupport(order = 100)
-    public Result<?> userLogin(@Validated(value = {DefaultGroup.class}) @RequestBody LoginForm form) {
-        // 获得对应登录类型的登录参数
-        JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
-        AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]对应的登录配置");
-        // 验证验证码
-        if (loginParams.getBool("captcha", false)) {
-            // 先检验验证码表单
-            ValidatorUtils.validateEntity(form, LoginForm.CaptchaGroup.class);
-            // 再校验验证码与魔术验证码不同，并且 校验失败
-            AssertUtils.isTrue(!form.getCaptchaValue().equalsIgnoreCase(loginParams.getStr("magicCaptcha")) && !captchaService.validate(form.getCaptchaUuid(), form.getCaptchaValue()), ErrorCode.CAPTCHA_ERROR);
-        }
-        UserEntity user;
-        if (form.getType().endsWith("USERNAME_PASSWORD")) {
-            // 帐号密码登录
-            user = authService.loginByUsernamePassword(form, loginParams);
-        } else if (form.getType().endsWith("MOBILE_SMS")) {
-            // 手机号验证码登录
-            user = authService.loginByMobileSms(form, loginParams);
-        } else {
-            // 其它登录方式
-            throw new OnexException(ErrorCode.UNKNOWN_LOGIN_TYPE);
-        }
-
-        // 创建token
-        String token = tokenService.createToken(user,
-                loginParams.getStr(AuthConst.TOKEN_STORE_TYPE_KEY, AuthConst.TOKEN_STORE_TYPE_VALUE),
-                form.getType(),
-                loginParams.getStr(AuthConst.TOKEN_JWT_KEY_KEY, AuthConst.TOKEN_JWT_KEY_VALUE),
-                loginParams.getInt(AuthConst.TOKEN_EXPIRE_KEY, AuthConst.TOKEN_EXPIRE_VALUE),
-                loginParams.getInt(AuthConst.TOKEN_LIMIT_KEY, AuthConst.TOKEN_LIMIT_VALUE));
-        // 登录成功
-        LoginResult loginResult = new LoginResult()
-                .setUser(ConvertUtils.sourceToTarget(user, UserDTO.class))
-                .setToken(token)
-                .setTokenKey(authProps.getTokenHeaderKey());
-        return new Result<>().success(loginResult);
-    }
-
-    @PostMapping("userLoginEncrypt")
+    /*@PostMapping("userLoginEncrypt")
     @AccessControl
     @Operation(summary = "用户登录(加密)", description = "Anon@将userLogin接口数据,做AES加密作为body的值")
     @LogOperation(value = "用户登录(加密)", type = "login")
@@ -163,7 +221,7 @@ public class AuthController {
     public Result<?> userLoginEncrypt(@Validated @RequestBody EncryptForm encryptForm) {
         LoginForm form = SignUtils.decodeAES(encryptForm.getBody(), Const.AES_KEY, LoginForm.class);
         return ((AuthController) AopContext.currentProxy()).userLogin(form);
-    }
+    }*/
 
     @PostMapping("userLogout")
     @Operation(summary = "用户登出")
@@ -193,19 +251,22 @@ public class AuthController {
     @LogOperation("用户修改密码")
     @ApiOperationSupport(order = 160)
     public Result<?> userChangePassword(@Validated @RequestBody ChangePasswordForm form) {
-        String tenantCode = ShiroUtils.getUserTenantCode();
-        // 先校验密码复杂度
-        JSONObject paramsContent = paramsService.getContentObject(null, tenantCode, null, UcConst.PARAMS_CODE_LOGIN, JSONObject.class, null);
-        AssertUtils.isNull(paramsContent, "配置信息为空");
+        // 获得对应登录类型的登录参数
+        JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
+        AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
+        // 先对密码做解密
+        String passwordPlaintext = PasswordUtils.aesDecode(form.getPasswordEncrypted(), StrUtil.emptyToDefault(authProps.getTransferKey(), Const.AES_KEY));
+        String newPasswordPlaintext = PasswordUtils.aesDecode(form.getNewPasswordEncrypted(), StrUtil.emptyToDefault(authProps.getTransferKey(), Const.AES_KEY));
+        // 对新密码密码强度做校验
         // 密码复杂度正则
-        AssertUtils.isTrue(StrUtil.isNotBlank(paramsContent.getStr("passwordRegExp")) && !ReUtil.isMatch(paramsContent.getStr("passwordRegExp"), form.getNewPassword()), ErrorCode.ERROR_REQUEST, paramsContent.getStr("passwordRegError", "密码不符合规则"));
+        AssertUtils.isTrue(StrUtil.isNotBlank(loginParams.getStr("passwordRegExp")) && !ReUtil.isMatch(loginParams.getStr("passwordRegExp"), newPasswordPlaintext), ErrorCode.ERROR_REQUEST, loginParams.getStr("passwordRegError", "密码不符合规则"));
         // 获取数据库中的用户
         UserEntity data = userService.getById(ShiroUtils.getUserId());
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 校验原密码
-        AssertUtils.isFalse(PasswordUtils.verify(form.getPassword(), data.getPassword()), ErrorCode.ACCOUNT_PASSWORD_ERROR);
+        AssertUtils.isFalse(PasswordUtils.verify(passwordPlaintext, data.getPassword()), ErrorCode.ACCOUNT_PASSWORD_ERROR);
         // 更新密码
-        userService.updatePassword(data.getId(), form.getNewPassword());
+        userService.updatePassword(data.getId(), newPasswordPlaintext, authProps.getPasswordStoreKey());
         // 注销该用户所有token,提示用户重新登录
         tokenService.deleteByUserIdList(Collections.singletonList(data.getId()));
         return new Result<>();
@@ -217,12 +278,13 @@ public class AuthController {
     @LogOperation("用户重置密码(帐号找回)")
     @ApiOperationSupport(order = 164)
     public Result<?> userResetPassword(@Validated @RequestBody ChangePasswordByMailCodeForm form) {
-        String tenantCode = ShiroUtils.getUserTenantCode();
-        // 先校验密码复杂度
-        JSONObject paramsContent = paramsService.getContentObject(null, tenantCode, null, UcConst.PARAMS_CODE_LOGIN, JSONObject.class, null);
-        AssertUtils.isNull(paramsContent, "配置信息为空");
+        // 获得对应登录类型的登录参数
+        JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
+        AssertUtils.isNull(loginParams, "缺少[" + form.getType() + "]登录配置");
+        // 先对密码做解密
+        String newPasswordPlaintext = PasswordUtils.aesDecode(form.getNewPasswordEncrypted(), StrUtil.emptyToDefault(authProps.getTransferKey(), Const.AES_KEY));
         // 密码复杂度正则
-        AssertUtils.isTrue(StrUtil.isNotBlank(paramsContent.getStr("passwordRegExp")) && !ReUtil.isMatch(paramsContent.getStr("passwordRegExp"), form.getPassword()), ErrorCode.ERROR_REQUEST, paramsContent.getStr("passwordRegError", "密码不符合规则"));
+        AssertUtils.isTrue(StrUtil.isNotBlank(loginParams.getStr("passwordRegExp")) && !ReUtil.isMatch(loginParams.getStr("passwordRegExp"), newPasswordPlaintext), ErrorCode.ERROR_REQUEST, loginParams.getStr("passwordRegError", "密码不符合规则"));
         // 获取数据库中的用户
         UserEntity data = userService.getById(ShiroUtils.getUserId());
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
@@ -234,19 +296,10 @@ public class AuthController {
         // 将短信消费掉
         msgService.consumeLog(lastSmsLog.getId());
         // 更新密码
-        userService.updatePassword(data.getId(), form.getPassword());
+        userService.updatePassword(data.getId(), newPasswordPlaintext, authProps.getPasswordStoreKey());
         // 注销该用户所有token,提示用户重新登录
         tokenService.deleteByUserIdList(Collections.singletonList(data.getId()));
         return new Result<>();
-    }
-
-    @PostMapping("userChangePasswordEncrypt")
-    @Operation(summary = "用户修改密码(加密)")
-    @LogOperation("用户修改密码(加密)")
-    @ApiOperationSupport(order = 170)
-    public Result<?> userChangePasswordEncrypt(@Validated @RequestBody EncryptForm encryptForm) {
-        ChangePasswordForm form = SignUtils.decodeAES(encryptForm.getBody(), Const.AES_KEY, ChangePasswordForm.class);
-        return ((AuthController) AopContext.currentProxy()).userChangePassword(form);
     }
 
     @PostMapping("userMenuScope")
