@@ -1,5 +1,6 @@
 package com.nb6868.onex.common.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -32,8 +33,9 @@ public class PasswordUtils {
 
     /**
      * 可逆AES加密
+     *
      * @param plaintext 明文
-     * @param key aes密钥
+     * @param key       aes密钥
      * @return 密文
      */
     public static String aesEncode(String plaintext, String key) {
@@ -42,12 +44,18 @@ public class PasswordUtils {
 
     /**
      * 可逆AES解密
+     *
      * @param password 密文
-     * @param key aes密钥
+     * @param key      aes密钥
      * @return 明文
      */
     public static String aesDecode(String password, String key) {
-        return SecureUtil.aes(key.getBytes()).decryptStr(password);
+        // 秘钥不同会报各种错误
+        try {
+            return SecureUtil.aes(key.getBytes()).decryptStr(password);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -63,8 +71,8 @@ public class PasswordUtils {
     /**
      * 比较密码是否相等
      *
-     * @param plaintext     明文密码
-     * @param encoded 加密后密码
+     * @param plaintext 明文密码
+     * @param encoded   加密后密码
      * @return 匹配结果
      */
     public static boolean verify(String plaintext, String encoded) {
@@ -74,29 +82,32 @@ public class PasswordUtils {
     /**
      * 加密
      *
-     * @param raw    字符串
+     * @param plaintext    字符串
      * @param secure 算法
      * @return 返回加密字符串
      */
-    public static String encode(String raw, String secure) {
+    public static String encode(String plaintext, String secure) {
         if ("sm3".equalsIgnoreCase(secure)) {
-            return SmUtil.sm3(raw);
+            return SmUtil.sm3(plaintext);
         }
-        return DigestUtil.bcrypt(raw);
+        return DigestUtil.bcrypt(plaintext);
     }
 
     /**
      * 比较密码是否相等
      *
-     * @param raw     明文密码
+     * @param plaintext     明文密码
      * @param encoded 加密后密码
      * @return 匹配结果
      */
-    public static boolean verify(String raw, String encoded, String secure) {
-        if ("sm3".equalsIgnoreCase(secure)) {
-            return encoded.equalsIgnoreCase(encode(raw, secure));
+    public static boolean verify(String plaintext, String encoded, String secure) {
+        if (StrUtil.hasBlank(plaintext,encoded)) {
+            return false;
         }
-        return DigestUtil.bcryptCheck(raw, encoded);
+        if ("sm3".equalsIgnoreCase(secure)) {
+            return encoded.equalsIgnoreCase(encode(plaintext, secure));
+        }
+        return DigestUtil.bcryptCheck(plaintext, encoded);
     }
 
 }

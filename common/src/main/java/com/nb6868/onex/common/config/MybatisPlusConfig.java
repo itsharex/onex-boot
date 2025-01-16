@@ -1,5 +1,6 @@
 package com.nb6868.onex.common.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,7 @@ public class MybatisPlusConfig extends BaseMybatisPlusConfig {
 
     /**
      * 配置插件
-     *
      * see {https://baomidou.com/pages/2976a3/}
-     *
      * 顺序:
      * 多租户,动态表名
      * 分页,乐观锁
@@ -35,7 +34,7 @@ public class MybatisPlusConfig extends BaseMybatisPlusConfig {
         // 动态表名拦截器
         // interceptor.addInnerInterceptor(initDynamicTableNameInnerInterceptor());
         // 分页拦截器
-        interceptor.addInnerInterceptor(initPaginationInterceptor());
+        interceptor.addInnerInterceptor(initPaginationInterceptor(DbType.MYSQL));
         // 乐观锁插件
         // interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         return interceptor;

@@ -91,6 +91,8 @@ spring:
 # see {https://mybatis.plus/config/}
 mybatis-plus:
   global-config:
+    # 配置databaseid
+    database-id: mysql
     # 数据库相关配置
     db-config:
       # 主键类型
@@ -194,9 +196,9 @@ onex:
     captcha-type: spec
     # 二维码有效期
     qrcode-timeout: 300000
-    # 密码存储aeskey,空表示不存
+    # 密码存储aeskey,空表示不存,128/192/256bit,即16/24/32
     password-store-key:
-    # 内容传输aesKey
+    # 内容传输aesKey,128/192/256bit,即16/24/32
     transfer-key:
 
 ## swagger

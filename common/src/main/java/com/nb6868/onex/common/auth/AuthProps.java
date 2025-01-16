@@ -24,14 +24,14 @@ public class AuthProps {
     @Schema(description = "访问白名单")
     private String whiteList;
 
-    @Schema(description = "访问控制")
-    private AccessControl accessControl;
-
     @Schema(description = "密码存储aeskey,空表示不存")
     private String passwordStoreKey;
 
     @Schema(description = "内容传输过长加密key")
     private String transferKey;
+
+    @Schema(description = "访问控制")
+    private AccessControl accessControl;
 
     @Data
     public static class AccessControl {

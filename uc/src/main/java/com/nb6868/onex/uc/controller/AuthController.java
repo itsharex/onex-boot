@@ -18,7 +18,10 @@ import com.nb6868.onex.common.msg.BaseMsgService;
 import com.nb6868.onex.common.msg.MsgLogBody;
 import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.msg.MsgTplBody;
-import com.nb6868.onex.common.pojo.*;
+import com.nb6868.onex.common.pojo.ApiResult;
+import com.nb6868.onex.common.pojo.BaseForm;
+import com.nb6868.onex.common.pojo.Const;
+import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.shiro.ShiroUser;
 import com.nb6868.onex.common.shiro.ShiroUtils;
 import com.nb6868.onex.common.util.*;
@@ -35,7 +38,6 @@ import com.nb6868.onex.uc.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -154,7 +156,9 @@ public class AuthController {
                 user.setUsername(userContact.getData().getStr("nick"));
                 user.setRealName(userContact.getData().getStr("nick"));
                 user.setPassword(DigestUtil.bcrypt(userIdResponse.getData().getStr("userid")));
-                user.setPasswordRaw(PasswordUtils.aesEncode(userIdResponse.getData().getStr("userid"), Const.AES_KEY));
+                if (StrUtil.isNotBlank(authProps.getPasswordStoreKey())) {
+                    user.setPasswordRaw(PasswordUtils.aesEncode(userIdResponse.getData().getStr("userid"), authProps.getPasswordStoreKey()));
+                }
                 user.setOauthUserid(userIdResponse.getData().getStr("userid"));
                 user.setOauthInfo(JSONUtil.parseObj(userContact.getData()));
                 user.setMobile(userContact.getData().getStr("mobile"));

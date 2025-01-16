@@ -34,7 +34,8 @@ public interface ShiroDao {
      * @param token      token
      * @param expireTime 失效时间(秒)
      */
-    @Update("UPDATE " + ShiroConst.TABLE_TOKEN + " SET expire_time = DATE_ADD(NOW(), interval #{expireTime} second) WHERE deleted = 0 AND token = #{token}")
+    @Update(value = "UPDATE " + ShiroConst.TABLE_TOKEN + " SET expire_time = DATE_ADD(NOW(), interval #{expireTime} second) WHERE deleted = 0 AND token = #{token}", databaseId = "mysql")
+    @Update(value = "UPDATE " + ShiroConst.TABLE_TOKEN + " SET expire_time = now() + #{expireTime} * interval '1 second' WHERE deleted = 0 AND token = #{token}", databaseId = "postgresql")
     int updateTokenExpireTime(@Param("token") String token, @Param("expireTime") Integer expireTime);
 
     /**

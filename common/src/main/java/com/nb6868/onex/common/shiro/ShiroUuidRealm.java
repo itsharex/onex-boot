@@ -29,9 +29,9 @@ import java.util.Map;
 public class ShiroUuidRealm extends BaseShiroRealm {
 
     @Autowired
-    private BaseParamsService paramsService;
+    BaseParamsService paramsService;
     @Autowired
-    private ShiroDao shiroDao;
+    ShiroDao shiroDao;
 
     /**
      * 认证(登录时调用)
@@ -41,24 +41,24 @@ public class ShiroUuidRealm extends BaseShiroRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         // AuthenticationToken包含身份信息和认证信息，在Filter中塞入
         String token = getTokenFromAuthenticationToken(authenticationToken);
-        Assert.isTrue(StrUtil.isNotBlank(token), ()-> new AuthenticationException("请先登录..."));
+        Assert.isTrue(StrUtil.isNotBlank(token), () -> new AuthenticationException("请先登录..."));
         // token存在数据库/缓存中
         Map<String, Object> tokenEntity = shiroDao.getUserTokenByToken(token);
-        Assert.notNull(tokenEntity, ()-> new AuthenticationException("登录信息已失效,请重新登录..."));
+        Assert.notNull(tokenEntity, () -> new AuthenticationException("登录信息已失效,请重新登录..."));
         // 检查账号id信息
         Long userId = MapUtil.getLong(tokenEntity, "user_id");
-        Assert.notNull(userId, ()-> new AuthenticationException("缺少登录用户信息,请重新登录..."));
+        Assert.notNull(userId, () -> new AuthenticationException("缺少登录用户信息,请重新登录..."));
         // 验证用户是否还存在
         Map<String, Object> userEntity = shiroDao.getUserById(userId);
         // 账号不存在
-        Assert.notNull(userEntity, ()-> new AuthenticationException("缺少登录账号信息,请重新登录..."));
+        Assert.notNull(userEntity, () -> new AuthenticationException("缺少登录账号信息,请重新登录..."));
         // 账号锁定
-        Assert.isTrue(MapUtil.getInt(userEntity, "state", -1) == ShiroConst.USER_STATE_ENABLED, ()-> new AuthenticationException("账号已锁定,请联系管理员..."));
+        Assert.isTrue(MapUtil.getInt(userEntity, "state", -1) == ShiroConst.USER_STATE_ENABLED, () -> new AuthenticationException("账号已锁定,请联系管理员..."));
 
         String loginType = MapUtil.getStr(tokenEntity, "type");
         // 获取jwt中的登录配置
         JSONObject loginConfig = paramsService.getSystemPropsJson(loginType);
-        Assert.notNull(loginConfig, ()-> new AuthenticationException("缺少登录信息配置,请重新登录..."));
+        Assert.notNull(loginConfig, () -> new AuthenticationException("缺少登录信息配置,请重新登录..."));
         // 转换成UserDetail对象
         ShiroUser shiroUser = BeanUtil.toBean(userEntity, ShiroUser.class, CopyOptions.create().setAutoTransCamelCase(true).setIgnoreCase(true));
         shiroUser.setLoginType(loginType);

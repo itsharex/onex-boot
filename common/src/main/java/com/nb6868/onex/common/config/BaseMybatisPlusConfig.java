@@ -33,8 +33,8 @@ public abstract class BaseMybatisPlusConfig {
     /**
      * 初始化分页拦截器
      */
-    protected InnerInterceptor initPaginationInterceptor() {
-        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
+    protected InnerInterceptor initPaginationInterceptor(DbType dbType) {
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(dbType);
         // 单页分页条数限制，默认不受限制
         paginationInnerInterceptor.setMaxLimit(-1L);
         // 溢出总页数后是否进行处理
