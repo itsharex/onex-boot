@@ -1,12 +1,8 @@
 package com.nb6868.onex.common.jpa;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * 通用CRUD封装BaseDao接口
@@ -20,19 +16,7 @@ import java.util.Collection;
  * @author Charles zhangchaoxu@gmail.com
  */
 public interface BaseDao<T> extends BaseMapper<T> {
-    /**
-     * @deprecated
-     * 通过wrapper软删除
-     * see {LogicDeleteByIdWithFill}
-     *
-     * @param entity  实体
-     * @param wrapper wrapper
-     * @return result 删除结果
-     */
-    @Deprecated
-    Integer deleteByWrapperWithFill(@Param(Constants.ENTITY) T entity, @Param(Constants.WRAPPER) Wrapper<T> wrapper);
-
-    /**
+        /**
      * 根据 ID 查询条数
      *
      * @param id 主键ID

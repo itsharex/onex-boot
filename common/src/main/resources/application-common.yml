@@ -96,12 +96,12 @@ mybatis-plus:
     # 数据库相关配置
     db-config:
       # 主键类型
-      id-type: ASSIGN_ID
+      id-type: AUTO
       # 字段策略
       insert-strategy: NOT_NULL
       update-strategy: NOT_NULL
-      # 逻辑删除配置
-      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      # 逻辑删除配置,mysql=UNIX_TIMESTAMP, postgreql=floor(extract(epoch from now()))
+      logic-delete-value: 'UNIX_TIMESTAMP()' # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
     # 关闭mp3.0自带的banner
     banner: false

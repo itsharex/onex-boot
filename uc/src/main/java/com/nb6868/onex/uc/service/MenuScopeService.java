@@ -42,7 +42,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(userIds)) {
             return true;
         }
-        return logicDeleteByWrapper(update().in("user_id", userIds).eq("type", UcConst.MenuScopeTypeEnum.USER.value()));
+        return remove(lambdaQuery().in(MenuScopeEntity::getUserId, userIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.USER.value()));
     }
 
     /**
@@ -55,7 +55,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(roleIds)) {
             return true;
         }
-        return logicDeleteByWrapper(update().in("role_id", roleIds).eq("type", UcConst.MenuScopeTypeEnum.ROLE.value()));
+        return remove(lambdaQuery().in(MenuScopeEntity::getRoleId, roleIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()));
     }
 
     /**
@@ -68,7 +68,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(menuIds)) {
             return true;
         }
-        return logicDeleteByWrapper(update().in("menu_id", menuIds));
+        return remove(lambdaQuery().in(MenuScopeEntity::getMenuId, menuIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()));
     }
 
 }

@@ -47,7 +47,7 @@ public class RoleUserService extends EntityService<RoleUserDao, RoleUserEntity> 
         if (CollUtil.isEmpty(roleIds)) {
             return true;
         }
-        return logicDeleteByWrapper(update().in("role_id", roleIds));
+        return remove(lambdaQuery().in(RoleUserEntity::getRoleId, roleIds));
     }
 
     /**
@@ -59,7 +59,7 @@ public class RoleUserService extends EntityService<RoleUserDao, RoleUserEntity> 
         if (CollUtil.isEmpty(userIds)) {
             return true;
         }
-        return logicDeleteByWrapper(update().in("user_id", userIds));
+        return remove(lambdaQuery().in(RoleUserEntity::getUserId, userIds));
     }
 
 }

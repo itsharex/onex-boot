@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.*;
-import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.repository.CrudRepository;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.nb6868.onex.common.Const;
@@ -58,12 +59,13 @@ public class EntityService<M extends BaseDao<T>, T> extends CrudRepository<M, T>
      * @param wrapper 查询条件
      * @return 删除结果
      */
+    /*@Deprecated
     public boolean logicDeleteByWrapper(UpdateChainWrapper<T> wrapper) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(getEntityClass());
         return wrapper
                 .set(tableInfo.getLogicDeleteFieldInfo().getColumn(), tableInfo.getLogicDeleteFieldInfo().getLogicDeleteValue())
                 .update(getEntityModel());
-    }
+    }*/
 
     /**
      * 下级记录数量
