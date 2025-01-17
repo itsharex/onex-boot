@@ -113,7 +113,7 @@ public class RoleService extends DtoService<RoleDao, RoleEntity, RoleDTO> {
      */
     public void deleteAllById(@NotNull Long id) {
         // 删除角色
-        removeById(id);
+        removeById(id, false);
         // 删除角色菜单关联关系
         menuScopeService.deleteByRoleIdList(Collections.singletonList(id));
         // 删除角色用户关联关系

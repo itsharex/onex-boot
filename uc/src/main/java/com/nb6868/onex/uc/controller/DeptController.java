@@ -105,8 +105,8 @@ public class DeptController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        deptService.removeById(form.getId());
+    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+        deptService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

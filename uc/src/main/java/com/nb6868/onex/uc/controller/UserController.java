@@ -7,7 +7,7 @@ import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
-import com.nb6868.onex.common.pojo.ChangeStateForm;
+import com.nb6868.onex.common.pojo.ChangeStateReq;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
@@ -138,7 +138,7 @@ public class UserController {
     @Operation(summary = "更新状态")
     @LogOperation("更新状态")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:edit"}, logical = Logical.OR)
-    public Result<?> changeState(@Validated(value = {DefaultGroup.class, ChangeStateForm.BoolStateGroup.class}) @RequestBody ChangeStateForm request) {
+    public Result<?> changeState(@Validated(value = {DefaultGroup.class, ChangeStateReq.BoolStateGroup.class}) @RequestBody ChangeStateReq request) {
         userService.changeState(request);
 
         return new Result<>();

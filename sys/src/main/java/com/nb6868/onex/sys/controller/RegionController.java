@@ -108,8 +108,8 @@ public class RegionController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:region", "sys:region:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        regionService.removeById(form.getId());
+    public Result<?> delete(@Validated(value = DefaultGroup.class) @RequestBody IdReq req) {
+        regionService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

@@ -5,7 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
-import com.nb6868.onex.common.pojo.ChangeStateForm;
+import com.nb6868.onex.common.pojo.ChangeStateReq;
 import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.shiro.ShiroDao;
 import com.nb6868.onex.common.shiro.ShiroUser;
@@ -133,7 +133,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
      */
     public void deleteAllByIds(List<Long> ids) {
         // 删除用户本身
-        removeByIds(ids);
+        removeByIds(ids, false);
         // 删除用户-角色关系
         roleUserService.deleteByUserIdList(ids);
         // 删除用户-权限关系
@@ -145,7 +145,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
     /**
      * 修改状态
      */
-    public boolean changeState(ChangeStateForm form) {
+    public boolean changeState(ChangeStateReq form) {
         boolean ret = update().set("state", form.getState()).eq("id", form.getId()).update(new UserEntity());
         if (ret) {
             if (form.getState() == UcConst.UserStateEnum.DISABLE.value()) {
@@ -191,7 +191,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
     @Transactional(rollbackFor = Exception.class)
     public boolean merge(String mergeTo, List<String> mergeFrom) {
         // 删除被合并帐号
-        removeByIds(mergeFrom);
+        removeByIds(mergeFrom, false);
         // 将被删除业务数据中的create_id/update_id更新为mergeTo
         return true;
     }

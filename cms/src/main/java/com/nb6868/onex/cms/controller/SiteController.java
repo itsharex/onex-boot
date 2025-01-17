@@ -100,7 +100,7 @@ public class SiteController {
     @RequiresPermissions("cms:site:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> delete(@Validated @RequestBody IdReq form) {
-        siteService.removeById(form.getId());
+        siteService.removeById(form.getId(), false);
 
         return new Result<>();
     }

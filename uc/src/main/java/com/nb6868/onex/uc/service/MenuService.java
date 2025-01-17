@@ -128,7 +128,7 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
         // 获得所有菜单id
         List<Long> menuIds = getCascadeChildrenListByIds(Collections.singletonList(id));
         // 删除所有菜单
-        removeByIds(menuIds);
+        removeByIds(menuIds, false);
         // 删除菜单授权关系
         menuScopeService.deleteByMenuIds(menuIds);
     }

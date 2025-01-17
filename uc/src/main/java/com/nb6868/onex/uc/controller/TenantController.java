@@ -98,8 +98,8 @@ public class TenantController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 100)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        tenantService.removeById(form.getId());
+    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+        tenantService.remove(QueryWrapperHelper.getPredicate(req));
         // 按业务需求做其它操作
         return new Result<>();
     }

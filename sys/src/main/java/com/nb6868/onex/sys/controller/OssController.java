@@ -330,8 +330,8 @@ public class OssController {
     @LogOperation("批量删除")
     @ApiOperationSupport(order = 110)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:oss", "sys:oss:delete"}, logical = Logical.OR)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
-        ossService.removeByIds(form.getIds());
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq req) {
+        ossService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

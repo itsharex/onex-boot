@@ -98,8 +98,8 @@ public class ArticleController {
     @LogOperation("删除")
     @RequiresPermissions("cms:article:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        articleService.removeById(form.getId());
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
+        articleService.removeById(req.getId(), false);
 
         return new Result<>();
     }
@@ -109,8 +109,8 @@ public class ArticleController {
     @LogOperation("批量删除")
     @RequiresPermissions("cms:article:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
-        articleService.removeByIds(form.getIds());
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq req) {
+        articleService.removeByIds(req.getIds(), false);
 
         return new Result<>();
     }

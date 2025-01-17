@@ -44,7 +44,7 @@ public abstract class BaseDTO implements Serializable {
 
     @Schema(description = "逻辑删除")
     @JsonIgnore
-    private Integer deleted;
+    private Long deleted;
 
     @Schema(description = "是否存在id，用来判断还是新增")
     @JsonIgnore

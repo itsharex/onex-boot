@@ -47,5 +47,5 @@ public abstract class BaseStringEntity implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     @TableLogic
     @JsonIgnore
-    private Integer deleted;
+    private Long deleted;
 }

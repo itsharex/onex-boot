@@ -21,19 +21,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * 广告位
  * axd是因为ad会被部分广告拦截的浏览器插件拦截掉
+ *
  * @author Charles zhangchaoxu@gmail.com
  */
 @RestController
-@RequestMapping( "/cms/axd")
+@RequestMapping("/cms/axd")
 @Validated
-@Tag(name="广告位")
+@Tag(name = "广告位")
 public class AxdController {
 
     @Autowired
@@ -97,8 +101,8 @@ public class AxdController {
     @LogOperation("删除")
     @RequiresPermissions("cms:axd:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        axdService.removeById(form.getId());
+    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+        axdService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }
@@ -108,8 +112,8 @@ public class AxdController {
     @LogOperation("批量删除")
     @RequiresPermissions("cms:axd:delete")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
-        axdService.removeByIds(form.getIds());
+    public Result<?> deleteBatch(@Validated(value = {DefaultGroup.class}) @RequestBody IdsReq req) {
+        axdService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

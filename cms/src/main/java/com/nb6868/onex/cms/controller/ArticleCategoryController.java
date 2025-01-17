@@ -109,7 +109,7 @@ public class ArticleCategoryController {
         // 检查是否存在子类和文章
         AssertUtils.isTrue(articleCategoryService.childrenCount(data.getId()) > 0, "存在子类,不允许删除");
         AssertUtils.isTrue(articleService.countByArticleCategoryId(data.getId()) > 0, "存在文章,不允许删除");
-        articleCategoryService.removeById(data.getId());
+        articleCategoryService.removeById(data.getId(), false);
         return new Result<>();
     }
 

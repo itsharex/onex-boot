@@ -108,8 +108,8 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        msgTplService.removeById(form.getId());
+    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+        msgTplService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }
@@ -141,8 +141,8 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgLog:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 50)
-    public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq form) {
-        msgLogService.removeByIds(form.getIds());
+    public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq req) {
+        msgLogService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

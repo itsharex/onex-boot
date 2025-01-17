@@ -1,6 +1,6 @@
 package com.nb6868.onex.cms.dto;
 
-import com.nb6868.onex.common.pojo.BaseTenantDTO;
+import com.nb6868.onex.common.pojo.BaseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Schema(name = "广告位")
-public class AxdDTO extends BaseTenantDTO {
+public class AxdDTO extends BaseDTO {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "标题")

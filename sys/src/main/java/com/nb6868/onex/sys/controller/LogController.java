@@ -47,8 +47,8 @@ public class LogController {
     @Operation(summary = "批量删除")
     @LogOperation("批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:delete"}, logical = Logical.OR)
-    public Result<?> deleteBatch(@Validated @RequestBody IdsReq form) {
-        logService.removeByIds(form.getIds());
+    public Result<?> deleteBatch(@Validated @RequestBody IdsReq req) {
+        logService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

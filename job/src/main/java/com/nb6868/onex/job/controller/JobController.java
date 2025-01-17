@@ -95,12 +95,11 @@ public class JobController {
     @ApiOperationSupport(order = 50)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:job:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
-        JobDTO data = jobService.oneDto(QueryWrapperHelper.getPredicate(form));
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
+        JobDTO data = jobService.oneDto(QueryWrapperHelper.getPredicate(req));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
-
-        jobService.removeById(form.getId());
-
+        // 删除数据
+        jobService.remove(QueryWrapperHelper.getPredicate(req));
         return new Result<>();
     }
 
@@ -143,8 +142,8 @@ public class JobController {
     @LogOperation("日志批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:jobLog:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 120)
-    public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq form) {
-        jobLogService.removeByIds(form.getIds());
+    public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq req) {
+        jobLogService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
     }

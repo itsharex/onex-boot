@@ -9,7 +9,7 @@ import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.exception.OnexException;
 import com.nb6868.onex.common.log.BaseLogService;
 import com.nb6868.onex.common.msg.BaseMsgService;
-import com.nb6868.onex.common.pojo.ChangeStateForm;
+import com.nb6868.onex.common.pojo.ChangeStateReq;
 import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.PasswordUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -63,7 +63,7 @@ public class AuthService {
                 int continuousLoginErrorTimes = logService.getContinuousLoginErrorTimes(form.getUsername(), form.getTenantCode(), passwordErrorMinuteOffset, passwordErrorMaxTimes - 1);
                 if (continuousLoginErrorTimes >= passwordErrorMaxTimes - 1) {
                     // 锁定用户
-                    ChangeStateForm changeStateForm = new ChangeStateForm();
+                    ChangeStateReq changeStateForm = new ChangeStateReq();
                     changeStateForm.setState(UcConst.UserStateEnum.DISABLE.value());
                     changeStateForm.setId(user.getId());
                     userService.changeState(changeStateForm);
