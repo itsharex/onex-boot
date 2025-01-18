@@ -1,6 +1,6 @@
 # 数据库设计规范和实现
 
-程序开发基于MySQL5.7实现,理论上支持Oracle、SQLServer、DB2等其它数据库  
+程序开发以MySQL作为目标,目前在MySQL8.0中经过比较成熟的实践，在PostgreSQL中经过简单测试验证。 
 _注意_ 修改表中各个数据库中有区别的地方 
 _注意_ 修改Mapper文件中是否有MySQL特有的查询语句
 
@@ -24,15 +24,26 @@ _注意_ 修改Mapper文件中是否有MySQL特有的查询语句
    * 普通索引命令: idx_表名缩写_字段名
 
 ## 主键
-
+~~
 数据主键id使用MyBatisPlus的ID_Worker，一律使用20位的unsigned tinyint，注意在pojo中使用Long定义  
-优点是兼具自增主键的连续性(优化查询效率)和uuid的不可推测性    
+优点是兼具自增主键的连续性(优化查询效率)和uuid的不可推测性
+~~
+经过实际项目验证，最终还是决定使用自增主键。
 注意\_ JavaScript无法处理Java的Long,会导致精度丢失,具体表现为主键最后两位永远为0,解决思路:Long 转为 String 返回 [更多文档](https://mybatis.plus/guide/logic-delete.html)
 
 ## 逻辑删除
-
+~~
 逻辑删除deleted使用1位的unsigned tinyint,1表示删除,0表示未删除  
-在Entity中为deleted加上@TableLogic注解,对于使用Wrapper查询的sql会自动加上deleted = 1  
+在Entity中为deleted加上@TableLogic注解,对于使用Wrapper查询的sql会自动加上deleted = 1
+~~
+原项目中采用0和1作为逻辑删除的区分，后来发现以下几个问题不好处理
+1. 无法直接获得删除时间，只能通过update_time的填充(而将删除时间填充如update_time也会有歧义)或者是日志记录查询。
+2. 无法满足一些唯一约束，比如用户表的username必须唯一且有unique key的约束，如果出现(多次)删除后，就无法再次添加。   
+为了解决上述问题，最终决定采用0和unix_timestamp作为逻辑删除的区分，逻辑删除字段还是使用deleted，数据类型限定为Long(int8)。    
+默认值为0，表示位删除
+当逻辑删除后塞入unix秒时间戳，对于上述问题2，可以使用username + deleted组合作为unique key约束。
+
+需要注意的是：
 但是如果在mapper中做了自定义级联查询,需要手动加上deleted = 0的条件  
 [更多文档](https://mybatis.plus/guide/logic-delete.html)
 
@@ -64,6 +75,30 @@ public class DemoEntity extends BaseEntity {
    private JSONObject params;    
 }
 ```
+
+## postgresql建表语句
+````postgresql
+DROP TABLE IF EXISTS "test"."uc_test";
+CREATE TABLE "test"."uc_test" (
+  "id" int8 NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "create_name" varchar(50),
+  "create_id" int8,
+  "create_time" timestamp(6),
+  "update_id" int8,
+  "update_time" timestamp(6),
+  "deleted" int8 NOT NULL DEFAULT 0,
+  PRIMARY KEY ("id")
+)
+;
+COMMENT ON COLUMN "test"."uc_test"."id" IS 'ID';
+COMMENT ON COLUMN "test"."uc_test"."create_name" IS '创建者名字';
+COMMENT ON COLUMN "test"."uc_test"."create_id" IS '创建者ID';
+COMMENT ON COLUMN "test"."uc_test"."create_time" IS '创建时间';
+COMMENT ON COLUMN "test"."uc_test"."update_id" IS '更新者ID';
+COMMENT ON COLUMN "test"."uc_test"."update_time" IS '更新时间';
+COMMENT ON COLUMN "test"."uc_test"."deleted" IS '逻辑删除';
+COMMENT ON TABLE "test"."uc_test" IS '模块-表名';
+````
 
 ## ref
 
