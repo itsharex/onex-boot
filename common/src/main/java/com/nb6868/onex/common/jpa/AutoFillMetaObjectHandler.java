@@ -66,7 +66,7 @@ public class AutoFillMetaObjectHandler implements MetaObjectHandler {
         ShiroUser user = ShiroUtils.getUser();
         Date now = new Date();
 
-        strictInsertFill(metaObject, DELETED, Integer.class, 0);
+        strictInsertFill(metaObject, DELETED, Long.class, 0L);
         strictInsertFill(metaObject, CREATE_TIME, Date.class, now);
         strictInsertFill(metaObject, UPDATE_TIME, Date.class, now);
         /*if (metaObject.hasGetter(DEPT_ID) && metaObject.getValue(DEPT_ID) == null && user.getDeptId() != null) {
