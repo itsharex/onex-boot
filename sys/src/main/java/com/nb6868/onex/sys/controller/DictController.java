@@ -86,7 +86,7 @@ public class DictController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
-    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         dictService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();

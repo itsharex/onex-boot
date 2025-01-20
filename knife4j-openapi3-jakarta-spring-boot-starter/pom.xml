@@ -6,7 +6,7 @@
     <parent>
         <artifactId>onex-boot</artifactId>
         <groupId>com.nb6868.onex</groupId>
-        <version>4.3.13</version>
+        <version>4.3.14</version>
     </parent>
 
     <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
@@ -61,7 +61,6 @@
                 <configuration>
                     <source>${knife4j-java.version}</source>
                     <target>${knife4j-java.version}</target>
-                    <encoding>${knife4j-project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
         </plugins>

@@ -118,7 +118,7 @@ public class ParamsController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         paramsService.remove(QueryWrapperHelper.getPredicate(req));
         return new Result<>();
     }

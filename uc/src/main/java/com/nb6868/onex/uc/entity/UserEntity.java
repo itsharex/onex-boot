@@ -117,5 +117,13 @@ public class UserEntity extends BaseEntity {
      * 第三方帐号用户id
      */
     private String oauthUserid;
+    /**
+     * 关联表id
+     */
+    private Long relId;
+    /**
+     * 关联表名称，冗余
+     */
+    private String relName;
 
 }

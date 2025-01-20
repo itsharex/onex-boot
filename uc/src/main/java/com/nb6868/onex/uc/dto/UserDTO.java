@@ -105,4 +105,10 @@ public class UserDTO extends BaseDTO {
     @Schema(description = "第三方帐号用户id")
     private String oauthUserid;
 
+    @Schema(description = "关联表id")
+    private Long relId;
+
+    @Schema(description = "关联表名称")
+    private String relName;
+
 }

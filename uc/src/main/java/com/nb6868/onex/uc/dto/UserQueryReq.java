@@ -14,6 +14,10 @@ import java.util.List;
 public class UserQueryReq extends PageReq {
 
     @Query
+    @Schema(description = "关联表id")
+    private Long relId;
+
+    @Query
     @Schema(description = "用户名")
     private String username;
 

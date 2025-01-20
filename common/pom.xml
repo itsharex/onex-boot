@@ -5,7 +5,7 @@
     <parent>
         <artifactId>onex-boot</artifactId>
         <groupId>com.nb6868.onex</groupId>
-        <version>4.3.13</version>
+        <version>4.3.14</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>com.nb6868.onex</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-            <version>${onex.version}</version>
+            <version>4.3.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>

@@ -1,38 +1,35 @@
 package ${package}.modules.${moduleName}.controller;
 
-import cn.afterturn.easypoi.excel.entity.ImportParams;
+import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import ${package}.${moduleName}..dto.${className}SaveOrUpdateReq;
+import ${package}.${moduleName}..dto.${className}QueryReq;
+import ${package}.${moduleName}.dto.${className}DTO;
+import ${package}.${moduleName}.service.${className}Service;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.exception.ErrorCode;
-import com.nb6868.onex.common.Const;
-import com.nb6868.onex.common.pojo.MsgResult;
+import com.nb6868.onex.common.pojo.BaseReq;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
-import com.nb6868.onex.common.util.ConvertUtils;
+import com.nb6868.onex.common.util.ExcelExportParams;
+import com.nb6868.onex.common.util.ExcelExportUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.ValidatorUtils;
 import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
+import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
-import com.nb6868.onex.common.util.ExcelUtils;
-import ${package}.modules.${moduleName}.dto.${className}DTO;
-import ${package}.modules.${moduleName}.excel.${className}Excel;
-import ${package}.modules.${moduleName}.service.${className}Service;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.nb6868.onex.uc.service.ParamsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * ${comments}
@@ -45,115 +42,100 @@ import java.util.Map;
 @Tag(name = "${comments}")
 public class ${className}Controller {
     @Autowired
-    private ${className}Service ${classname}Service;
+    ${className}Service ${classname}Service;
+    @Autowired
+    ParamsService paramsService;
 
-    @GetMapping("list")
+    @PostMapping({"querySchema", "formSchema"})
+    @Operation(summary = "表单参数")
+    public Result<?> formSchema(@Validated @RequestBody BaseReq req) {
+        String code = "${moduleName}_${className}";
+        JSONObject params = paramsService.getSystemContentObject(code, JSONObject.class, new JSONObject());
+        // 添加自主定义
+        return new Result<>().success(params);
+    }
+
+    @PostMapping("list")
     @Operation(summary = "列表")
-    @RequiresPermissions("${moduleName}:${pathName}:list")
-    public Result<?> list(@ApiIgnore @RequestParam Map<String, Object> params) {
-        List<${className}DTO> list = ${classname}Service.listDto(params);
-
+    @RequiresPermissions("${moduleName}:${pathName}:query")
+    public Result<?> list(@Validated({DefaultGroup.class}) @RequestBody ${className}QueryReq form) {
+        // 拼接查询条件
+        QueryWrapper<${className}Entity> queryWrapper = ${classname}Service.buildQueryWrapper(form, "list");
+        List<<${className}DTO>> list = ${classname}Service.listDto(queryWrapper);
         return new Result<>().success(list);
     }
 
-    @GetMapping("page")
+    @PostMapping("page")
     @Operation(summary = "分页")
-    @RequiresPermissions("${moduleName}:${pathName}:page")
-    public Result<?> page(@ApiIgnore @RequestParam Map<String, Object> params) {
-        PageData<${className}DTO> page = ${classname}Service.pageDto(params);
-
+    @RequiresPermissions("${moduleName}:${pathName}:query")
+    public Result<?> page(@Validated({DefaultGroup.class, PageGroup.class}) @RequestBod ${className}QueryReq req) {
+        // 拼接查询条件
+        QueryWrapper${className}Entity> queryWrapper = ${classname}Service.buildQueryWrapper(req, "page");
+        PageData<${className}DTO> page = ${classname}Service.pageDto(req, queryWrapper);
         return new Result<>().success(page);
     }
 
-    @GetMapping("info")
+    @PostMapping("info")
     @Operation(summary = "信息")
-    @RequiresPermissions("${moduleName}:${pathName}:info")
-    public Result<?> info(@RequestParam @NotNull(message = "{id.require}") Long id) {
-        ${className}DTO data = ${classname}Service.getDtoById(id);
+    @RequiresPermissions("${moduleName}:${pathName}:query")
+    public Result<?> info(@Validated @RequestBod IdReq req) {
+        ${className}DTO data = ${classname}Service.getDtoById(req.getId());
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
         return new Result<>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
-    @RequiresPermissions("${moduleName}:${pathName}:save")
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody ${className}DTO dto) {
-        ${classname}Service.saveDto(dto);
-
-        return new Result<>().success(dto);
+    @PostMapping("saveOrUpdateValidate")
+    @Operation(summary = "提交校验")
+    public Result<?> saveOrUpdateValidate(@Validated(value = {DefaultGroup.class}) @RequestBody ${className}SaveOrUpdateReq req) {
+        // 检查数据
+        Dict result = Dict.create().set("alert", false);
+        return new Result<>().success(result);
     }
 
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions("${moduleName}:${pathName}:update")
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody ${className}DTO dto) {
-        ${classname}Service.updateDto(dto);
-
-        return new Result<>().success(dto);
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或修改")
+    @LogOperation("新增或修改")
+    @RequiresPermissions("${moduleName}:${pathName}:edit")
+    public Result<?> saveOrUpdate(@Validated(value = {DefaultGroup.class}) @RequestBody ${className}SaveOrUpdateReq form) {
+        // 校验数据
+        ValidatorUtils.validateEntity(!form.hasId(), form, AddGroup.class);
+        ValidatorUtils.validateEntity(form.hasId(), form, UpdateGroup.class);
+        // 处理数据
+        ${className}Entity entity  = ${classname}Service.saveOrUpdateByReq(form);
+        return new Result<>().success(entity);
     }
 
     @PostMapping("delete")
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions("${moduleName}:${pathName}:delete")
-    public Result<?> delete(@NotNull(message = "{id.require}") @RequestParam Long id) {
-        ${classname}Service.removeById(id);
-
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
+        // 删除数据
+        boolean ret = ${classname}Service.removeById(req.getId());
         return new Result<>();
     }
 
-    @DeleteMapping("deleteBatch")
-    @Operation(summary = "批量删除")
-    @LogOperation("批量删除")
-    @RequiresPermissions("${moduleName}:${pathName}:deleteBatch")
-    public Result<?> deleteBatch(@NotEmpty(message = "{ids.require}")@RequestBody List<Long> ids) {
-        ${classname}Service.removeByIds(ids);
-
-        return new Result<>();
-    }
-
-    @GetMapping("export")
-    @Operation(summary = "导出")
-    @LogOperation("导出")
-    @RequiresPermissions("${moduleName}:${pathName}:export")
-    public void export(@ApiIgnore @RequestParam Map<String, Object> params, HttpServletResponse response) {
-        List<${className}DTO> list = ${classname}Service.listDto(params);
-
-        ExcelUtils.exportExcelToTarget(response, "${comments}", list, ${className}Excel.class);
-    }
-
-    @PostMapping("import")
-    @Operation(summary = "导入")
-    @LogOperation("导入")
-    @RequiresPermissions("${moduleName}:${pathName}:import")
-    public Result<?> importExcel(@RequestParam("file") MultipartFile file) {
-        AssertUtils.isTrue(file.isEmpty(), ErrorCode.UPLOAD_FILE_EMPTY);
-        ImportParams params = new ImportParams();
-        params.setStartSheetIndex(0);
-        List<${className}Excel> list = ExcelUtils.importExcel(file, ${className}Excel.class, params);
-
-        AssertUtils.isTrue(list.isEmpty(), ErrorCode.ERROR_REQUEST, "Excel内容为空");
-        AssertUtils.isTrue(list.size() > Const.EXCEL_IMPORT_LIMIT, ErrorCode.ERROR_REQUEST, "单次导入不得超过" + Const.EXCEL_IMPORT_LIMIT + "条");
-
-        List<MsgResult> result = new ArrayList<>();
-        for (${className}Excel item : list) {
-            ${className}DTO dto = ConvertUtils.sourceToTarget(item, ${className}DTO.class);
-            MsgResult validateResult = ValidatorUtils.getValidateResult(dto, DefaultGroup.class, AddGroup.class);
-            if (validateResult.isSuccess()) {
-                try {
-                    ${classname}Service.saveDto(dto);
-                    result.add(new MsgResult().success("导入成功"));
-                } catch (Exception e) {
-                    result.add(new MsgResult().error(ErrorCode.ERROR_REQUEST, e.getMessage()));
-                }
-            } else {
-                result.add(validateResult);
-            }
+    @PostMapping("exportExcel")
+    @Operation(summary = "导出Excel")
+    @LogOperation("导出Excel")
+    public Result<?> exportExcel(@Validated({DefaultGroup.class}) @RequestBody ${className}QueryReq req) {
+        // 获得excel导出配置
+        ExcelExportParams excelExportParams = paramsService.getSystemContentObject("${modelName}N_${className}_EXPORT", ExcelExportParams.class, null);
+        AssertUtils.isNull(excelExportParams, "缺少导出配置");
+        // 开始处理导出
+        if (excelExportParams.isAsync()) {
+            return new Result<>().error("未实现异步导出");
+        } else {
+            // 拼接查询条件
+            QueryWrapper<${className}Entity> queryWrapper = ${classname}Service.buildQueryWrapper(req, "list");
+            List<${className}DTO> list = ${classname}Service.listDto(queryWrapper);
+            String fileName = ExcelExportUtils.beanListExport(list, excelExportParams, null, null);
+            // 文件上传到oss
+            return new Result<>().success(Dict.create()
+                    .set("async", excelExportParams.isAsync())
+                    .set("url", ExcelExportUtils.getFileRequestPath(fileName)));
         }
-        return new Result<>().success(result);
     }
 
 }

@@ -89,7 +89,7 @@ public class BillController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions("uc:bill:delete")
-    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         billService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();

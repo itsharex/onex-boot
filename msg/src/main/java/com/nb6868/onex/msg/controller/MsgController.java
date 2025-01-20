@@ -108,7 +108,7 @@ public class MsgController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
-    public Result<?> delete(@Validated(value = {DefaultGroup.class}) @RequestBody IdReq req) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         msgTplService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
