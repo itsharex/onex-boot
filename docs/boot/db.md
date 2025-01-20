@@ -100,6 +100,12 @@ COMMENT ON COLUMN "test"."uc_test"."deleted" IS '逻辑删除';
 COMMENT ON TABLE "test"."uc_test" IS '模块-表名';
 ````
 
+## 经验
+1. 基础字段(create_time、create_id等)尽量不要和业务耦合，比如有一个填表人和填表时间，而你不确定用户后续是否会要求支持可以修改或者自定义填表人和填表时间的时候，就不要使用create_time和create_id来用做这个业务需求，单独再加字段
+2. 适当的冗余字段，比如各种人，字段留了user_id的时候，适当冗余user_name, 这样表单查看的时候就可以避免级联查询用户表
+3. 合理使用中间表，比如订单和商品，里面还涉及到订单中的商品排序，可以合理使用中间表，并且再中间表中加入sort等字段来满足需求。
+4. 适当避免bool类型的字段定义，建议用tinyint（int2），可以支持后续选项内容的扩展；即使使用bool类型，字段名避免is_开头，会在java bean过程出现歧义
+
 ## ref
 
 * [并发扣款，如何保证数据的一致性？](https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651962738&idx=1&sn=d2d91a380bad06af9f7b9f7a80db26b3)
