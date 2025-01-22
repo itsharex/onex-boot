@@ -7,20 +7,20 @@ import lombok.EqualsAndHashCode;
 import org.apache.ibatis.type.Alias;
 
 /**
- * 角色-用户关系
+ * 角色-部门用户关系
  *
  * @author Charles zhangchaoxu@gmail.com
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("uc_role_user")
-@Alias("uc_role_user")
-public class RoleUserEntity extends BaseEntity {
+@TableName("uc_dept_user")
+@Alias("uc_dept_user")
+public class DeptUserEntity extends BaseEntity {
 
     /**
-     * 角色ID
+     * 部门ID
      */
-	private Long roleId;
+	private Long deptId;
     /**
      * 用户ID
      */

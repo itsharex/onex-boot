@@ -115,6 +115,71 @@ public interface UcConst {
     }
 
     /**
+     * 角色用户关系类型
+     */
+    enum RoleUserTypeEnum {
+
+        /**
+         * 详见name
+         */
+        DEFAULT(0, "默认"),
+        SPECIAL(1, "特殊关系,预留");
+
+        private int value;
+        private String name;
+
+        RoleUserTypeEnum(int value) {
+            this.value = value;
+        }
+
+        RoleUserTypeEnum(int value, String name) {
+            this.value = value;
+            this.name = name;
+        }
+
+        public int value() {
+            return this.value;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    /**
+     * 部门用户关系类型
+     */
+    enum DeptUserTypeEnum {
+
+        /**
+         * 详见name秒，还有其他的自行扩展
+         */
+        DEFAULT(0, "隶属该部门"),
+        IN_CHARGE(1, "负责该部门"),
+        LEADER(2, "领导该部门");
+
+        private int value;
+        private String name;
+
+        DeptUserTypeEnum(int value) {
+            this.value = value;
+        }
+
+        DeptUserTypeEnum(int value, String name) {
+            this.value = value;
+            this.name = name;
+        }
+
+        public int value() {
+            return this.value;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    /**
      * 权限范围类型
      */
     enum MenuScopeTypeEnum {

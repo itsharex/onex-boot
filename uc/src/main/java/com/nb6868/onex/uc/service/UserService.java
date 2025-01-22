@@ -94,7 +94,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
     protected void afterSaveOrUpdateDto(boolean ret, UserDTO dto, UserEntity existedEntity, int type) {
         if (ret) {
             // 保存角色用户关系
-            roleUserService.saveOrUpdateByUserIdAndRoleIds(dto.getId(), dto.getRoleIds());
+            roleUserService.saveOrUpdateByUserIdAndRoleIds(dto.getId(), dto.getRoleIds(), UcConst.RoleUserTypeEnum.DEFAULT.value());
         }
     }
 

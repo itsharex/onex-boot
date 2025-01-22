@@ -169,7 +169,7 @@ public class AuthController {
                 // AssertUtils.isTrue(userService.hasDuplicated(null, "mobile", user.getMobile()), ErrorCode.ERROR_REQUEST, "手机号已存在");
                 userService.save(user);
                 // 保存角色关系
-                roleUserService.saveOrUpdateByUserIdAndRoleIds(user.getId(), loginParams.getBeanList("autoCreateUserRoleIds", Long.class));
+                roleUserService.saveOrUpdateByUserIdAndRoleIds(user.getId(), loginParams.getBeanList("autoCreateUserRoleIds", Long.class), UcConst.RoleUserTypeEnum.DEFAULT.value());
             } else {
                 return new Result<>().error("用户未注册");
             }
