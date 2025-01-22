@@ -28,7 +28,7 @@ public class RelationService extends EntityService<RelationDao, RelationEntity> 
     @Transactional(rollbackFor = Exception.class)
     public boolean saveOrUpdateByLeftIdAndRightIds(@NotNull Long leftId, List<Long> rightIds) {
         // 先删除关系
-        remove(lambdaQuery().eq(RelationEntity::getLeftId, leftId));
+        remove(lambdaQuery().eq(RelationEntity::getLeftId, leftId).getWrapper());
         // 保存关系
         CollUtil.distinct(rightIds).forEach(id -> {
             RelationEntity entity = new RelationEntity();

@@ -53,7 +53,7 @@ public class RegionService extends DtoService<RegionDao, RegionEntity, RegionDTO
      * @return 结果
      */
     public boolean deleteById(Long id) {
-        return remove(new QueryWrapper<RegionEntity>().likeRight("id", id));
+        return remove(lambdaQuery().likeRight(RegionEntity::getId, id).getWrapper());
     }
 
 }

@@ -42,7 +42,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(userIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(MenuScopeEntity::getUserId, userIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.USER.value()));
+        return remove(lambdaQuery().in(MenuScopeEntity::getUserId, userIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.USER.value()).getWrapper());
     }
 
     /**
@@ -55,7 +55,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(roleIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(MenuScopeEntity::getRoleId, roleIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()));
+        return remove(lambdaQuery().in(MenuScopeEntity::getRoleId, roleIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()).getWrapper());
     }
 
     /**
@@ -68,7 +68,7 @@ public class MenuScopeService extends EntityService<MenuScopeDao, MenuScopeEntit
         if (CollUtil.isEmpty(menuIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(MenuScopeEntity::getMenuId, menuIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()));
+        return remove(lambdaQuery().in(MenuScopeEntity::getMenuId, menuIds).eq(MenuScopeEntity::getType, UcConst.MenuScopeTypeEnum.ROLE.value()).getWrapper());
     }
 
 }

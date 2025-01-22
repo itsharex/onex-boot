@@ -89,7 +89,7 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
      * @return result
      */
     public boolean deleteToken(String token) {
-        return remove(lambdaQuery().eq(TokenEntity::getToken, token));
+        return remove(lambdaQuery().eq(TokenEntity::getToken, token).getWrapper());
     }
 
     /**
@@ -100,9 +100,7 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
      * @return result
      */
     public boolean deleteTokenByUserId(Long userId, String type) {
-        return remove(lambdaQuery()
-                .eq(TokenEntity::getUserId, userId)
-                .eq(StrUtil.isNotBlank(type), TokenEntity::getType, type));
+        return remove(lambdaQuery().eq(TokenEntity::getUserId, userId).eq(StrUtil.isNotBlank(type), TokenEntity::getType, type).getWrapper());
     }
 
     /**
@@ -112,7 +110,7 @@ public class TokenService extends EntityService<TokenDao, TokenEntity> {
      * @return result
      */
     public boolean deleteByUserIdList(List<Long> userIds) {
-        return remove(lambdaQuery().in(TokenEntity::getUserId, userIds));
+        return remove(lambdaQuery().in(TokenEntity::getUserId, userIds).getWrapper());
     }
 
 }

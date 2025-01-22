@@ -26,14 +26,15 @@ public class DeptUserService extends EntityService<DeptUserDao, DeptUserEntity> 
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean saveOrUpdateByUserIdAndDeptIds(Long userId, List<Long> deptIds, Integer type) {
-        // 先删除角色用户关系
-        deleteByUserIdList(CollUtil.toList(userId));
-
-        // 保存角色用户关系
+        // 保存部门用户关系
         CollUtil.distinct(deptIds).forEach(deptId -> {
+            // 先删除户关系
+            remove(lambdaQuery().eq(DeptUserEntity::getUserId, userId).eq(DeptUserEntity::getDeptId, deptId).eq(DeptUserEntity::getType, type).getWrapper());
+            // 再做保存
             DeptUserEntity entity = new DeptUserEntity();
             entity.setUserId(userId);
             entity.setDeptId(deptId);
+            entity.setType(type);
             save(entity);
         });
         return true;
@@ -48,7 +49,7 @@ public class DeptUserService extends EntityService<DeptUserDao, DeptUserEntity> 
         if (CollUtil.isEmpty(deptIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(DeptUserEntity::getDeptId, deptIds));
+        return remove(lambdaQuery().in(DeptUserEntity::getDeptId, deptIds).getWrapper());
     }
 
     /**
@@ -60,7 +61,7 @@ public class DeptUserService extends EntityService<DeptUserDao, DeptUserEntity> 
         if (CollUtil.isEmpty(userIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(DeptUserEntity::getUserId, userIds));
+        return remove(lambdaQuery().in(DeptUserEntity::getUserId, userIds).getWrapper());
     }
 
 }

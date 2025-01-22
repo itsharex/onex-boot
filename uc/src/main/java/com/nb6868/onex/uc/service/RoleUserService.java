@@ -25,11 +25,11 @@ public class RoleUserService extends EntityService<RoleUserDao, RoleUserEntity> 
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean saveOrUpdateByUserIdAndRoleIds(Long userId, List<Long> roleIds, Integer type) {
-        // 先删除角色用户关系
-        deleteByUserIdList(CollUtil.toList(userId));
-
         // 保存角色用户关系
         CollUtil.distinct(roleIds).forEach(roleId -> {
+            // 先删除户关系
+            remove(lambdaQuery().eq(RoleUserEntity::getUserId, userId).eq(RoleUserEntity::getRoleId, roleId).eq(RoleUserEntity::getType, type).getWrapper());
+            // 再做保存
             RoleUserEntity roleUserEntity = new RoleUserEntity();
             roleUserEntity.setUserId(userId);
             roleUserEntity.setRoleId(roleId);
@@ -48,7 +48,7 @@ public class RoleUserService extends EntityService<RoleUserDao, RoleUserEntity> 
         if (CollUtil.isEmpty(roleIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(RoleUserEntity::getRoleId, roleIds));
+        return remove(lambdaQuery().in(RoleUserEntity::getRoleId, roleIds).getWrapper());
     }
 
     /**
@@ -60,7 +60,7 @@ public class RoleUserService extends EntityService<RoleUserDao, RoleUserEntity> 
         if (CollUtil.isEmpty(userIds)) {
             return true;
         }
-        return remove(lambdaQuery().in(RoleUserEntity::getUserId, userIds));
+        return remove(lambdaQuery().in(RoleUserEntity::getUserId, userIds).getWrapper());
     }
 
 }
