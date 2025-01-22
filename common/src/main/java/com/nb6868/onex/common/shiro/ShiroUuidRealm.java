@@ -62,6 +62,7 @@ public class ShiroUuidRealm extends BaseShiroRealm {
         // 转换成UserDetail对象
         ShiroUser shiroUser = BeanUtil.toBean(userEntity, ShiroUser.class, CopyOptions.create().setAutoTransCamelCase(true).setIgnoreCase(true));
         shiroUser.setLoginType(loginType);
+        shiroUser.setLoginConfig(loginConfig);
         // token续期
         if (loginConfig.getInt(AuthConst.TOKEN_RENEWAL_EXPIRE_KEY, AuthConst.TOKEN_RENEWAL_EXPIRE_VALUE) > 0) {
             shiroDao.updateTokenExpireTime(token, loginConfig.getInt(AuthConst.TOKEN_RENEWAL_EXPIRE_KEY, AuthConst.TOKEN_RENEWAL_EXPIRE_VALUE));
