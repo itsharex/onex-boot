@@ -1,7 +1,6 @@
 package com.nb6868.onex.common.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nb6868.onex.common.jpa.Query;
 import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
@@ -27,9 +26,5 @@ public class BaseIdReq extends BaseReq {
     public boolean hasId() {
         return id != null && id > 0;
     }
-
-    @Query(type = Query.Type.LIMIT)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer pageSize = 1;
 
 }

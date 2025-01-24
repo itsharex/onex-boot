@@ -1,7 +1,12 @@
 # CHANGELOG
 
+## [4.4.7] 2025.01.24
+- upgrade: remove pageSize in BaseIdReq
+- enhance: add FileItem
+- upgrade: add default param code value
+
 ## [4.4.0] 2025.01.22 breaking changes
-- upgrade: 加入dept_user关联表、role_user增加type字段、user增加rel_id字段、dept增加oath字段
+- upgrade: add dept_user table、table role_user add type、table user add rel_id and rel_name、table dept add oauth_deptid and oauth_info
 
 ## [4.3.7] 2025.01.16
 - upgrade: upgrade aws-s3 to 2.29.52

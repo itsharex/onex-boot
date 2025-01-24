@@ -3,6 +3,7 @@ package com.nb6868.onex.sys.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -290,7 +291,7 @@ public class OssController {
     @Operation(summary = "获得已签名的post表单参数")
     @ApiOperationSupport(order = 80)
     public Result<?> getPreSignedPostForm(@Validated @RequestBody OssPreSignedReq form) {
-        OssPropsConfig ossConfig = paramsService.getSystemPropsObject(form.getParamsCode(), OssPropsConfig.class, null);
+        OssPropsConfig ossConfig = paramsService.getSystemPropsObject(StrUtil.emptyToDefault(form.getParamsCode(), SysConst.OSS_PUBLIC), OssPropsConfig.class, null);
         AbstractOssService uploadService = OssFactory.build(ossConfig);
         AssertUtils.isNull(uploadService, "未定义的上传方式");
 

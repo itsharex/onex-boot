@@ -2,7 +2,6 @@ package com.nb6868.onex.sys.dto;
 
 import com.nb6868.onex.common.pojo.BaseReq;
 import com.nb6868.onex.common.validator.EnumValue;
-import com.nb6868.onex.sys.SysConst;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -14,7 +13,7 @@ import lombok.EqualsAndHashCode;
 public class OssPreSignedReq extends BaseReq {
 
     @Schema(description = "配置参数名")
-    private String paramsCode = SysConst.OSS_PUBLIC;
+    private String paramsCode;
 
     @Schema(description = "路径前缀")
     private String prefix;
