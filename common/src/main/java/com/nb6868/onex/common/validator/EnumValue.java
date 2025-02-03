@@ -2,10 +2,12 @@ package com.nb6868.onex.common.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 
 /**
- * 限定传值
+ * 限定枚举值传参
+ * see <a href="https://blog.csdn.net/Lieforlove/article/details/101370087">...</a>
  *
  * @author Charles zhangchaoxu@gmail.com
  */
@@ -13,6 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = {EnumValueValidator.class})
+@Repeatable(EnumValue.List.class)
 public @interface EnumValue {
 
     // 默认错误消息
@@ -21,6 +24,12 @@ public @interface EnumValue {
     String[] strValues() default {};
 
     int[] intValues() default {};
+
+    Class<? extends Enum<?>>[] enumClass() default {}; // 枚举类
+
+    String enumValidMethod() default "isValid"; // 枚举校验方法
+
+    boolean enumAllowNull() default false; // 枚举是否允许为空
 
     // 分组
     Class<?>[] groups() default {};
