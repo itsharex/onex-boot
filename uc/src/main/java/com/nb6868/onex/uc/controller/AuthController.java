@@ -341,7 +341,7 @@ public class AuthController {
         List<String> permissions = new ArrayList<>();
         // 获取该用户所有menu
         menuService.getListByUser(user.getType(), user.getTenantCode(), user.getId(), null, null).forEach(menu -> {
-            if (menu.getShowMenu() == 1 && menu.getType() == UcConst.MenuTypeEnum.MENU.value()) {
+            if (menu.getShowMenu() == 1 && menu.getType() == UcConst.MenuTypeEnum.MENU.getCode()) {
                 // 菜单需要显示 && 菜单类型为菜单
                 menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create()
                         .set("component", menu.getComponent())
@@ -384,7 +384,7 @@ public class AuthController {
         ShiroUser user = ShiroUtils.getUser();
         List<TreeNode<Long>> menuList = new ArrayList<>();
         // 获取该用户所有menu, 菜单需要显示 && 菜单类型为菜单
-        menuService.getListByUser(user.getType(), user.getTenantCode(), user.getId(), UcConst.MenuTypeEnum.MENU.value(), 1)
+        menuService.getListByUser(user.getType(), user.getTenantCode(), user.getId(), UcConst.MenuTypeEnum.MENU.getCode(), 1)
                 .forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create()
                         .set("component", menu.getComponent())
                         .set("meta", menu.getMeta())

@@ -8,13 +8,13 @@ import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.RoleDTO;
 import com.nb6868.onex.uc.dto.RoleQueryReq;
+import com.nb6868.onex.uc.dto.RoleSaveOrUpdateReq;
+import com.nb6868.onex.uc.entity.RoleEntity;
 import com.nb6868.onex.uc.service.MenuScopeService;
 import com.nb6868.onex.uc.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,9 +37,9 @@ import java.util.List;
 public class RoleController {
 
     @Autowired
-    private RoleService roleService;
+    RoleService roleService;
     @Autowired
-    private MenuScopeService menuScopeService;
+    MenuScopeService menuScopeService;
 
     @PostMapping("page")
     @Operation(summary = "分页")
@@ -79,24 +79,14 @@ public class RoleController {
         return new Result<>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:edit"}, logical = Logical.OR)
     @ApiOperationSupport(order = 40)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody RoleDTO dto) {
-        roleService.saveDto(dto);
-
-        return new Result<>().success(dto);
-    }
-
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 50)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody RoleDTO dto) {
-        roleService.updateDto(dto);
+    public Result<?> save(@Validated @RequestBody RoleSaveOrUpdateReq req) {
+        RoleEntity entity = roleService.saveOrUpdateByReq(req);
+        RoleDTO dto = ConvertUtils.sourceToTarget(entity, RoleDTO.class);
 
         return new Result<>().success(dto);
     }
@@ -107,11 +97,11 @@ public class RoleController {
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:delete"}, logical = Logical.OR)
     @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在
-        AssertUtils.isFalse(roleService.hasIdRecord(form.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
+        AssertUtils.isFalse(roleService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         // 删除
-        roleService.deleteAllById(form.getId());
+        roleService.deleteAllById(req.getId());
         return new Result<>();
     }
 

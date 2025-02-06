@@ -1,18 +1,21 @@
 package com.nb6868.onex.uc.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
+import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.uc.dao.RoleDao;
 import com.nb6868.onex.uc.dto.RoleDTO;
+import com.nb6868.onex.uc.dto.RoleSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.RoleEntity;
 import com.nb6868.onex.uc.entity.RoleUserEntity;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,20 +34,30 @@ public class RoleService extends DtoService<RoleDao, RoleEntity, RoleDTO> {
     @Autowired
     RoleUserService roleUserService;
 
-    @Override
-    protected void beforeSaveOrUpdateDto(RoleDTO dto, int type) {
-        // 新增，检查角色编码是否存在
-        boolean hasRecord = hasDuplicated(dto.getId(), "code", dto.getCode());
-        AssertUtils.isTrue(hasRecord, "编码[" + dto.getId() + "]已存在");
-    }
-
-    @Override
+    /**
+     * 新增或修改
+     */
     @Transactional(rollbackFor = Exception.class)
-    public void afterSaveOrUpdateDto(boolean ret, RoleDTO dto, RoleEntity existedEntity, int type) {
-        if (ret) {
-            // 重新保存角色和菜单关系表
-            menuService.saveOrUpdateByRoleIdAndMenuIds(dto.getId(), dto.getMenuIdList());
+    public RoleEntity saveOrUpdateByReq(RoleSaveOrUpdateReq req) {
+        // 检查请求
+        AssertUtils.isTrue(hasDuplicated(req.getId(), "code", req.getCode()), "编码[" + req.getCode() + "]已存在");
+        // 转换数据格式
+        RoleEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+
+            BeanUtil.copyProperties(req, entity);
+        } else {
+            // 新增数据
+            entity = BeanUtil.copyProperties(req, RoleEntity.class);
         }
+        // 处理数据
+        saveOrUpdateById(entity);
+        // 重新保存角色和菜单关系表
+        menuService.saveOrUpdateByRoleIdAndMenuIds(entity.getId(), req.getMenuIdList());
+        return entity;
     }
 
     /**
