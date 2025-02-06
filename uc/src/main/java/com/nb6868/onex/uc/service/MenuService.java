@@ -1,5 +1,6 @@
 package com.nb6868.onex.uc.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,6 +11,7 @@ import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dao.MenuDao;
 import com.nb6868.onex.uc.dto.MenuDTO;
+import com.nb6868.onex.uc.dto.MenuSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.MenuEntity;
 import com.nb6868.onex.uc.entity.MenuScopeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +35,39 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
     @Autowired
     private ShiroDao shiroDao;
 
-    @Override
-    protected void beforeSaveOrUpdateDto(MenuDTO dto, int type) {
-        AssertUtils.isTrue(1 == type && dto.getId().equals(dto.getPid()), ErrorCode.ERROR_REQUEST, "上级不能为自身");
-    }
-
-    @Override
-    protected void afterSaveOrUpdateDto(boolean ret, MenuDTO dto, MenuEntity existedEntity, int type) {
-        if (ret && type == 1 && !StrUtil.equals(existedEntity.getPermissions(), dto.getPermissions())) {
-            // 更新的时候,同时更新menu_scope中的信息
-            menuScopeService.lambdaUpdate()
-                    .set(MenuScopeEntity::getMenuPermissions, dto.getPermissions())
-                    .eq(MenuScopeEntity::getMenuId, dto.getId())
-                    .update(new MenuScopeEntity());
+    /**
+     * 新增或修改
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public MenuEntity saveOrUpdateByReq(MenuSaveOrUpdateReq req) {
+        // 检查请求
+        // 检查父菜单
+        if (req.getPid() != 0) {
+            boolean pMenuExisted = lambdaQuery().eq(MenuEntity::getId, req.getPid()).exists();
+            AssertUtils.isFalse(pMenuExisted, "上级不存在");
         }
+        // 转换数据格式
+        MenuEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            AssertUtils.isTrue(req.getId().equals(req.getPid()), ErrorCode.ERROR_REQUEST, "上级不能为自身");
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+            // 更新的时候,同时更新menu_scope中的信息
+            if (!StrUtil.equals(entity.getPermissions(), req.getPermissions())) {
+                menuScopeService.lambdaUpdate()
+                        .set(MenuScopeEntity::getMenuPermissions, req.getPermissions())
+                        .eq(MenuScopeEntity::getMenuId, entity.getId())
+                        .update(new MenuScopeEntity());
+            }
+            BeanUtil.copyProperties(req, entity);
+        } else {
+            // 新增数据
+            entity = BeanUtil.copyProperties(req, MenuEntity.class);
+        }
+        // 处理数据
+        saveOrUpdateById(entity);
+        return entity;
     }
 
     /**

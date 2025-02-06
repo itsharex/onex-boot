@@ -69,9 +69,5 @@ public class MenuEntity extends BaseEntity {
      * 租户编码
      */
 	private String tenantCode;
-	/**
-	 * 上级菜单名称
-	 */
-	@TableField(exist = false)
-	private String parentName;
+
 }

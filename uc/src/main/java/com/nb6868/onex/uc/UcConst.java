@@ -1,5 +1,10 @@
 package com.nb6868.onex.uc;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Objects;
+
 /**
  * 用户中心相关常量
  *
@@ -249,29 +254,35 @@ public interface UcConst {
     /**
      * 菜单类型枚举
      */
+    @Getter
+    @AllArgsConstructor
     enum MenuTypeEnum {
         /**
          * 菜单
          */
-        MENU(0),
+        MENU(0, "菜单/页面"),
         /**
          * 按钮
          */
-        BUTTON(1),
+        BUTTON(1, "按钮/权限");
+
+        private int code;
+        private String title;
+
         /**
-         * 页面
+         * 是否有效
+         * @param codeValue
+         * @return
          */
-        PAGE(1);
-
-        private int value;
-
-        MenuTypeEnum(int value) {
-            this.value = value;
+        public static boolean isValid(Integer codeValue) {
+            for (MenuTypeEnum code : values()) {
+                if (Objects.equals(codeValue, code.getCode())) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public int value() {
-            return this.value;
-        }
     }
 
 }

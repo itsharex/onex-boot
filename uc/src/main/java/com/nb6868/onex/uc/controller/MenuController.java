@@ -10,13 +10,12 @@ import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.util.TreeNodeUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.MenuDTO;
 import com.nb6868.onex.uc.dto.MenuQueryReq;
+import com.nb6868.onex.uc.dto.MenuSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.MenuEntity;
 import com.nb6868.onex.uc.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +24,10 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,24 +73,14 @@ public class MenuController {
         return new Result<>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:edit"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody MenuDTO dto) {
-        menuService.saveDto(dto);
-
-        return new Result<>().success(dto);
-    }
-
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody MenuDTO dto) {
-        menuService.updateDto(dto);
-
+    public Result<?> saveOrUpdate(@Validated @RequestBody MenuSaveOrUpdateReq req) {
+        MenuEntity entity = menuService.saveOrUpdateByReq(req);
+        MenuDTO dto = ConvertUtils.sourceToTarget(entity, MenuDTO.class);
         return new Result<>().success(dto);
     }
 
@@ -97,12 +89,12 @@ public class MenuController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:delete"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据
-        MenuEntity data = menuService.getOne(QueryWrapperHelper.getPredicate(form));
+        MenuEntity data = menuService.getById(req.getId());
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 级联删除菜单以及下面所有子菜单
-        menuService.deleteAllCascadeById(data.getId());
+        menuService.deleteAllCascadeById(req.getId());
         return new Result<>();
     }
 
