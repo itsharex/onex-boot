@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @Schema(name = "日志")
 public class LogDTO extends BaseDTO {
+
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "类型")
@@ -26,6 +27,9 @@ public class LogDTO extends BaseDTO {
 
     @Schema(description = "请求参数")
     private JSONObject requestParams;
+
+    @Schema(description = "请求体")
+    private String requestBody;
 
     @Schema(description = "耗时(毫秒)")
     private Long requestTime;

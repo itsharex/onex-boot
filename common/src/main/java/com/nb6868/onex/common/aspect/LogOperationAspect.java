@@ -48,7 +48,7 @@ import java.util.Map;
 public class LogOperationAspect {
 
     @Autowired
-    private BaseLogService logService;
+    BaseLogService logService;
 
     @Pointcut("@annotation(com.nb6868.onex.common.annotation.LogOperation)")
     public void pointcut() {
@@ -127,22 +127,23 @@ public class LogOperationAspect {
         logEntity.setState(state);
         logEntity.setRequestTime(time);
         logEntity.setType(logType);
+        logEntity.setRequestBody(params);
         // 保存错误信息
         if (e != null) {
             logEntity.setContent(e instanceof OnexException ? e.toString() : ExceptionUtil.stacktraceToString(e));
         }
         // 请求参数
-        JSONObject requestParams = new JSONObject().set("params", params);
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
         if (null != request) {
             logEntity.setUri(request.getRequestURI());
-            // 记录内容
+            JSONObject requestParams = new JSONObject();
             requestParams.set("ip", HttpContextUtils.getIpAddr(request));
             requestParams.set("ua", request.getHeader(HttpHeaders.USER_AGENT));
             requestParams.set("queryString", request.getQueryString());
             requestParams.set("url", request.getRequestURL());
             requestParams.set("method", request.getMethod());
             requestParams.set("contentType", request.getContentType());
+            logEntity.setRequestParams(requestParams);
             /*if (request instanceof OnexHttpServletRequestWrapper) {
                 try {
                     requestParams.set("params", IoUtil.read(request.getInputStream()).toString());
@@ -151,7 +152,6 @@ public class LogOperationAspect {
                 }
             }*/
         }
-        logEntity.setRequestParams(requestParams);
         logService.saveLog(logEntity);
     }
 
@@ -165,11 +165,9 @@ public class LogOperationAspect {
         List<Object> actualParam = new ArrayList<>();
         for (Object arg : args) {
             // 只处理能处理的
-            if (arg instanceof MultipartFile) {
-                MultipartFile file = (MultipartFile) arg;
+            if (arg instanceof MultipartFile file) {
                 actualParam.add(Dict.create().set("type", "file").set("name", file.getOriginalFilename()).set("size", file.getSize()));
-            } else if (arg instanceof MultipartFile[]) {
-                MultipartFile[] files = (MultipartFile[]) arg;
+            } else if (arg instanceof MultipartFile[] files) {
                 List<Dict> list = new ArrayList<>();
                 for (MultipartFile file : files) {
                     list.add(Dict.create().set("type", "file").set("name", file.getOriginalFilename()).set("size", file.getSize()));

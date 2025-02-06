@@ -3,10 +3,13 @@ package com.nb6868.onex.sys.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
+import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.QueryWrapperHelper;
+import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.sys.dto.LogDTO;
 import com.nb6868.onex.sys.dto.LogQueryReq;
@@ -36,11 +39,21 @@ public class LogController {
     @Operation(summary = "分页")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:query"}, logical = Logical.OR)
-    public Result<?> page(@Validated({PageGroup.class}) @RequestBody LogQueryReq form) {
-        QueryWrapper<LogEntity> queryWrapper = QueryWrapperHelper.getPredicate(form, "page");
-        PageData<LogDTO> page = logService.pageDto(form, queryWrapper);
+    public Result<?> page(@Validated({PageGroup.class}) @RequestBody LogQueryReq req) {
+        QueryWrapper<LogEntity> queryWrapper = QueryWrapperHelper.getPredicate(req, "page");
+        PageData<LogDTO> page = logService.pageDto(req, queryWrapper);
 
         return new Result<>().success(page);
+    }
+
+    @PostMapping("info")
+    @Operation(summary = "详情")
+    @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:query"}, logical = Logical.OR)
+    public Result<?> info(@Validated @RequestBody IdReq req) {
+        LogDTO date = logService.getDtoById(req.getId());
+        AssertUtils.isNull(date, ErrorCode.DB_RECORD_NOT_EXISTED);
+
+        return new Result<>().success(date);
     }
 
     @PostMapping("deleteBatch")

@@ -48,6 +48,10 @@ public class LogBody implements Serializable {
      */
     private JSONObject requestParams;
     /**
+     * 请求体
+     */
+    private String requestBody;
+    /**
      * 用户名
      */
     private String createName;

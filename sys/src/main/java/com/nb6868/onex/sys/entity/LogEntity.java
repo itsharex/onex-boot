@@ -44,14 +44,18 @@ public class LogEntity extends BaseEntity {
      * 耗时(毫秒)
      */
     private Long requestTime;
-
     /**
      * 请求参数
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private JSONObject requestParams;
     /**
-     * 状态  0：失败   1：成功
+     * 请求体
+     */
+    // @TableField(typeHandler = JacksonTypeHandler.class)
+    private String requestBody;
+    /**
+     * 状态
      */
     private Integer state;
     /**
