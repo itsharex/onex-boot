@@ -55,6 +55,7 @@ public class MenuController {
                 .set("type", menu.getType())
                 .set("icon", menu.getIcon())
                 .set("url", menu.getUrl())
+                .set("showMenu", menu.getShowMenu())
                 .set("urlNewBlank", menu.getUrlNewBlank()))));
         List<Tree<Long>> treeList = TreeNodeUtils.buildIdTree(menuList);
         return new Result<>().success(treeList);

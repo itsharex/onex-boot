@@ -15,6 +15,10 @@ public class MenuQueryReq extends BaseReq {
     @Schema(description = "类型")
     private Integer type;
 
+    @Query(blurryType = Query.BlurryType.OR, type = Query.Type.LIKE, column = "name,component,permissions,permissions")
+    @Schema(description = "搜索关键词")
+    private String search;
+
     @Query(type = Query.Type.EQ_STRICT_EMPTY)
     @Schema(description = "租户编码,对租户无效")
     private String tenantCode;
