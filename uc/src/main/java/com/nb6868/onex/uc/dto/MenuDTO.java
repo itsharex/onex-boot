@@ -1,5 +1,6 @@
 package com.nb6868.onex.uc.dto;
 
+import cn.hutool.json.JSONObject;
 import com.nb6868.onex.common.pojo.BaseDTO;
 import com.nb6868.onex.common.validator.EnumValue;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
@@ -39,6 +40,12 @@ public class MenuDTO extends BaseDTO {
 
     @Schema(description = "菜单或页面URL")
     private String url;
+
+    @Schema(description = "组件名称")
+    private String component;
+
+    @Schema(description = "meta")
+    private JSONObject meta;
 
     @Schema(description = "菜单新页面打开")
     private Integer urlNewBlank;

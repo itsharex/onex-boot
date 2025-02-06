@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController("SysJob")
 @RequestMapping("/sys/job/")
 @Validated
 @Tag(name = "定时任务")

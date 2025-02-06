@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @RestController("TunnelDb")
-@RequestMapping("/tunnel/db")
+@RequestMapping("/tunnel/db/")
 @Validated
 @Slf4j
 @Tag(name = "数据操作")

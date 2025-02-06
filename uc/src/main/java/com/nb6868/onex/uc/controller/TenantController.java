@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/uc/tenant")
+@RestController("UcTenant")
+@RequestMapping("/uc/tenant/")
 @Validated
 @Tag(name = "租户管理")
 public class TenantController {

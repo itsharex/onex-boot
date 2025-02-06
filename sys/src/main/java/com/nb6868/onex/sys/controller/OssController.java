@@ -47,7 +47,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@RestController("SysOss")
 @RequestMapping("/sys/oss/")
 @Validated
 @Tag(name = "存储管理")

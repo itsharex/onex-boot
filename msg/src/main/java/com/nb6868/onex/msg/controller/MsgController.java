@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController("SysMsg")
 @RequestMapping("/sys/msg/")
 @Validated
 @Tag(name = "消息管理")

@@ -38,8 +38,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@RestController
-@RequestMapping("/uc/user")
+@RestController("UcUser")
+@RequestMapping("/uc/user/")
 @Validated
 @Tag(name = "用户管理")
 public class UserController {

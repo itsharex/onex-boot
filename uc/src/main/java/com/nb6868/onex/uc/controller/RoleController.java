@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/uc/role")
+@RestController("UcRole")
+@RequestMapping("/uc/role/")
 @Validated
 @Tag(name = "角色管理")
 public class RoleController {

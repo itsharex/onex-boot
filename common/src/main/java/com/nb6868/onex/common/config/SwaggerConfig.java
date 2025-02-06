@@ -61,6 +61,8 @@ public class SwaggerConfig {
             // 对operations做处理,影响controller中的方法
             if (openApi.getPaths() != null) {
                 openApi.getPaths().forEach((s, pathItem) -> pathItem.readOperations().forEach(operation -> {
+                    // 默认用方法名作为operationId，存在同名问题
+                    operation.setOperationId(operation.getTags().get(0) + "-" + operation.getOperationId());
                     // 解决文档中请求头部不显示的问题
                     // 可以在controller中加@SecurityRequirement(name ="auth-token")
                     // 也可以在method中@Operation(summary = "分页", security = {@SecurityRequirement(name = "auth-token")})

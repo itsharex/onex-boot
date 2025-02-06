@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/uc/post")
+@RestController("UcPost")
+@RequestMapping("/uc/post/")
 @Validated
 @Tag(name = "岗位管理")
 public class PostController {

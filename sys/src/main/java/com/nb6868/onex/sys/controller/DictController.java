@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/sys/dict")
+@RestController("SysDict")
+@RequestMapping("/sys/dict/")
 @Validated
 @Tag(name = "数据字典")
 public class DictController {

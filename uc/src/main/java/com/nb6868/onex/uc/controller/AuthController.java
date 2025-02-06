@@ -49,7 +49,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-@RestController
+@RestController("UcAuth")
 @RequestMapping("/uc/auth/")
 @Validated
 @Tag(name = "用户授权")
@@ -343,7 +343,12 @@ public class AuthController {
         menuService.getListByUser(user.getType(), user.getTenantCode(), user.getId(), null, null).forEach(menu -> {
             if (menu.getShowMenu() == 1 && menu.getType() == UcConst.MenuTypeEnum.MENU.value()) {
                 // 菜单需要显示 && 菜单类型为菜单
-                menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create().set("icon", menu.getIcon()).set("url", menu.getUrl()).set("urlNewBlank", menu.getUrlNewBlank())));
+                menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create()
+                        .set("component", menu.getComponent())
+                        .set("meta", menu.getMeta())
+                        .set("icon", menu.getIcon())
+                        .set("url", menu.getUrl())
+                        .set("urlNewBlank", menu.getUrlNewBlank())));
             }
             if (StrUtil.isNotBlank(menu.getUrl())) {
                 urlList.add(ConvertUtils.sourceToTarget(menu, MenuResult.class));
@@ -380,7 +385,12 @@ public class AuthController {
         List<TreeNode<Long>> menuList = new ArrayList<>();
         // 获取该用户所有menu, 菜单需要显示 && 菜单类型为菜单
         menuService.getListByUser(user.getType(), user.getTenantCode(), user.getId(), UcConst.MenuTypeEnum.MENU.value(), 1)
-                .forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create().set("icon", menu.getIcon()).set("url", menu.getUrl()).set("urlNewBlank", menu.getUrlNewBlank()))));
+                .forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create()
+                        .set("component", menu.getComponent())
+                        .set("meta", menu.getMeta())
+                        .set("icon", menu.getIcon())
+                        .set("url", menu.getUrl())
+                        .set("urlNewBlank", menu.getUrlNewBlank()))));
         List<Tree<Long>> menuTree = TreeNodeUtils.buildIdTree(menuList);
         return new Result<>().success(menuTree);
     }

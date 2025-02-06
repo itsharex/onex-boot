@@ -30,20 +30,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 菜单权限
- * 注意这不仅仅是menu，还是permissions
- *
- * @author Charles zhangchaoxu@gmail.com
- */
-@RestController
-@RequestMapping("/uc/menu")
+@RestController("UcMenu")
+@RequestMapping("/uc/menu/")
 @Validated
 @Tag(name = "菜单权限")
 public class MenuController {
 
     @Autowired
-    private MenuService menuService;
+    MenuService menuService;
 
     @PostMapping("tree")
     @Operation(summary = "树列表", description = "按租户来,不做用户的权限区分")
@@ -52,7 +46,14 @@ public class MenuController {
     public Result<?> tree(@Validated @RequestBody MenuQueryReq form) {
         QueryWrapper<MenuEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         List<TreeNode<Long>> menuList = new ArrayList<>();
-        menuService.list(queryWrapper).forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create().set("permissions", menu.getPermissions()).set("type", menu.getType()).set("icon", menu.getIcon()).set("url", menu.getUrl()).set("urlNewBlank", menu.getUrlNewBlank()))));
+        menuService.list(queryWrapper).forEach(menu -> menuList.add(new TreeNode<>(menu.getId(), menu.getPid(), menu.getName(), menu.getSort()).setExtra(Dict.create()
+                .set("component", menu.getComponent())
+                .set("meta", menu.getMeta())
+                .set("permissions", menu.getPermissions())
+                .set("type", menu.getType())
+                .set("icon", menu.getIcon())
+                .set("url", menu.getUrl())
+                .set("urlNewBlank", menu.getUrlNewBlank()))));
         List<Tree<Long>> treeList = TreeNodeUtils.buildIdTree(menuList);
         return new Result<>().success(treeList);
     }

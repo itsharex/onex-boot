@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("SysWebSocketController")
+@RestController("SysWebSocket")
 @RequestMapping("/sys/webSocket/")
 @Validated
 @Tag(name = "WebSocket")

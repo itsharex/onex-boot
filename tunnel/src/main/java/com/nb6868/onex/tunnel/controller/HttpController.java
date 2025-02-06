@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("TunnelHttp")
-@RequestMapping("/tunnel/http")
+@RequestMapping("/tunnel/http/")
 @Validated
 @Slf4j
 @Tag(name = "网络请求操作")

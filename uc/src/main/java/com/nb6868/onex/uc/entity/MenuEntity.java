@@ -1,7 +1,9 @@
 package com.nb6868.onex.uc.entity;
 
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.nb6868.onex.common.pojo.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +16,7 @@ import org.apache.ibatis.type.Alias;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("uc_menu")
+@TableName(value = "uc_menu", autoResultMap = true)
 @Alias("uc_menu")
 public class MenuEntity extends BaseEntity {
 
@@ -54,6 +56,15 @@ public class MenuEntity extends BaseEntity {
      * 排序
      */
 	private Integer sort;
+	/**
+	 * 组件名称
+	 */
+	private String component;
+	/**
+	 * meta
+	 */
+	@TableField(typeHandler = JacksonTypeHandler.class)
+	private JSONObject meta;
     /**
      * 租户编码
      */

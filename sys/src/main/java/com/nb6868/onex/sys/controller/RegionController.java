@@ -36,8 +36,8 @@ import java.util.List;
  *
  * @author Charles zhangchaoxu@gmail.com
  */
-@RestController
-@RequestMapping("/sys/region")
+@RestController("SysRegion")
+@RequestMapping("/sys/region/")
 @Validated
 @Tag(name = "行政区域")
 public class RegionController {

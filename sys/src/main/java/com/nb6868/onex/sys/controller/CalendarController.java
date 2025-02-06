@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/sys/calendar")
+@RestController("SysCalendar")
+@RequestMapping("/sys/calendar/")
 @Validated
 @Tag(name = "万年历")
 public class CalendarController {

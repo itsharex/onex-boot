@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("UcParams")
 @RequestMapping("/uc/params/")
 @Validated
 @Tag(name = "参数管理")

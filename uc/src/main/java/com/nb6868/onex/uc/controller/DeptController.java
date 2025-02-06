@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/uc/dept")
+@RestController("UcDept")
+@RequestMapping("/uc/dept/")
 @Validated
 @Tag(name = "部门管理")
 public class DeptController {

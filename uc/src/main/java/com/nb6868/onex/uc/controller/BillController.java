@@ -26,13 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("ucBill")
+@RestController("UcBill")
 @RequestMapping("/uc/bill/")
 @Validated
-@Tag(name = "用户中心-账单流水")
+@Tag(name = "账单流水")
 public class BillController {
+
     @Autowired
-    private BillService billService;
+    BillService billService;
 
     @PostMapping("list")
     @Operation(summary = "列表")

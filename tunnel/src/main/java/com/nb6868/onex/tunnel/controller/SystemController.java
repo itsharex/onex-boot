@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("TunnelSystem")
-@RequestMapping("/tunnel/system")
+@RequestMapping("/tunnel/system/")
 @Validated
 @Slf4j
 @Tag(name = "系统信息")
