@@ -32,7 +32,6 @@ onex:
 @LogOperation("记录批量删除")
 @QueryDataScope(tenantFilter = true, tenantValidate = false)
 @RequiresPermissions("sys:msgLog:delete")
-@ApiOperationSupport(order = 50)
 public Result<?> logDeleteBatch(@Validated @RequestBody IdsTenantForm form) {
     // todo
     return new Result<>();

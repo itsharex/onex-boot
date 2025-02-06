@@ -23,7 +23,6 @@ public class AuthQrcodeController {
 
     @PostMapping("create")
     @Operation(summary = "生成二维码", description = "Anon")
-    @ApiOperationSupport(order = 10)
     public Result<?> create() {
         // 生成随机码
         String uuid = IdUtil.fastSimpleUUID();
@@ -34,7 +33,6 @@ public class AuthQrcodeController {
 
     @PostMapping("userLogin")
     @Operation(summary = "通过二维码登录", description = "Anon")
-    @ApiOperationSupport(order = 20)
     public Result<?> userLogin(@Validated(value = {DefaultGroup.class}) @RequestBody CodeLoginForm form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
@@ -82,7 +80,6 @@ public class AuthQrcodeController {
     @PostMapping("scan")
     @AccessControl
     @Operation(summary = "移动端扫描二维码", description = "Anon")
-    @ApiOperationSupport(order = 30)
     public Result<?> scan(@Validated(value = {DefaultGroup.class}) @RequestBody CodeForm form) {
         // 从缓存中，通过qrcode获得用户id
         String qrcodeContent = qrcodeService.getQrcode(form.getCode());

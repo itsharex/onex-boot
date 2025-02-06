@@ -51,7 +51,6 @@ public class MsgController {
     @Operation(summary = "模板分页")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 20)
     public Result<?> tplPage(@Validated({PageGroup.class}) @RequestBody MsgTplQueryReq form) {
         PageData<?> page = msgTplService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
@@ -62,7 +61,6 @@ public class MsgController {
     @Operation(summary = "模板列表")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 10)
     public Result<?> tplList(@Validated @RequestBody MsgTplQueryReq form) {
         List<?> list = msgTplService.listDto(QueryWrapperHelper.getPredicate(form));
         return new Result<>().success(list);
@@ -72,7 +70,6 @@ public class MsgController {
     @Operation(summary = "模板详情")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 30)
     public Result<?> info(@Validated @RequestBody IdReq form) {
         MsgTplDTO data = msgTplService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
@@ -84,7 +81,6 @@ public class MsgController {
     @Operation(summary = "模板保存")
     @LogOperation("模板保存")
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 40)
     public Result<?> tplSave(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody MsgTplDTO dto) {
         msgTplService.saveDto(dto);
 
@@ -95,7 +91,6 @@ public class MsgController {
     @Operation(summary = "模板修改")
     @LogOperation("模板修改")
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 50)
     public Result<?> tplUpdate(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody MsgTplDTO dto) {
         msgTplService.updateDto(dto);
 
@@ -107,7 +102,6 @@ public class MsgController {
     @LogOperation("模板删除")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:delete"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 60)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         msgTplService.remove(QueryWrapperHelper.getPredicate(req));
 
@@ -118,7 +112,6 @@ public class MsgController {
     @Operation(summary = "日志分页")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgLog:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 100)
     public Result<?> page(@Validated({PageGroup.class}) @RequestBody MsgLogQueryReq form) {
         PageData<?> page = msgLogService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
@@ -129,7 +122,6 @@ public class MsgController {
     @Operation(summary = "发送消息")
     @LogOperation("发送消息")
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msg:send"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 110)
     public Result<?> send(@Validated(value = {DefaultGroup.class}) @RequestBody MsgSendForm form) {
         boolean flag = msgService.sendMail(form);
         return new Result<>().bool(flag);
@@ -140,7 +132,6 @@ public class MsgController {
     @LogOperation("记录批量删除")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgLog:delete"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 50)
     public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq req) {
         msgLogService.remove(QueryWrapperHelper.getPredicate(req));
 

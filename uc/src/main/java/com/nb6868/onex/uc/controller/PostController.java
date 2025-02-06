@@ -1,6 +1,5 @@
 package com.nb6868.onex.uc.controller;
 
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
@@ -43,7 +42,6 @@ public class PostController {
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 10)
     public Result<?> page(@Validated({PageGroup.class}) @RequestBody PostQueryReq form) {
         PageData<?> page = postService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
@@ -54,7 +52,6 @@ public class PostController {
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 20)
     public Result<?> list(@Validated @RequestBody PostQueryReq form) {
         List<?> list = postService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
@@ -64,7 +61,6 @@ public class PostController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 30)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> info(@Validated @RequestBody IdReq form) {
         PostDTO data = postService.oneDto(QueryWrapperHelper.getPredicate(form));
@@ -77,7 +73,6 @@ public class PostController {
     @Operation(summary = "保存")
     @LogOperation("保存")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 40)
     public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody PostDTO dto) {
         postService.saveDto(dto);
 
@@ -88,7 +83,6 @@ public class PostController {
     @Operation(summary = "修改")
     @LogOperation("修改")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 50)
     public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody PostDTO dto) {
         postService.updateDto(dto);
 
@@ -99,7 +93,6 @@ public class PostController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:delete"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> delete(@Validated @RequestBody IdReq form) {
         // 判断数据是否存在

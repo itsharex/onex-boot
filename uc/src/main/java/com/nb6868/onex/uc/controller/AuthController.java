@@ -9,7 +9,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.annotation.LogOperation;
@@ -78,7 +77,6 @@ public class AuthController {
     @PostMapping("captcha")
     @AccessControl
     @Operation(summary = "图形验证码(base64)", description = "Anon")
-    @ApiOperationSupport(order = 10)
     public Result<?> captcha(@Validated @RequestBody BaseReq req) {
         // 获得登录验证码配置,设置默认杜绝空信息
         JSONObject captchaParams = paramsService.getSystemPropsObject("CAPTCHA_LOGIN", JSONObject.class, new JSONObject());
@@ -100,7 +98,6 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "用户账号密码登录", description = "Anon")
     @LogOperation(value = "用户账号密码登录", type = "login")
-    @ApiOperationSupport(order = 20)
     public Result<?> userLogin(@Validated @RequestBody LoginByUsernamePasswordReq req) {
         // 检查密码不为空
         AssertUtils.isTrue(StrUtil.isAllBlank(req.getPassword(), req.getPasswordEncrypted(), "密码不能为空"));
@@ -135,7 +132,6 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "手机验证码登录", description = "Anon")
     @LogOperation(value = "手机验证码登录", type = "login")
-    @ApiOperationSupport(order = 30)
     public Result<?> userLoginByMobileSms(@Validated @RequestBody LoginByMobileSmsReq req) {
         // 获得对应登录类型的登录参数,并且设置默认类型
         JSONObject loginParams = paramsService.getSystemPropsJson(StrUtil.blankToDefault(req.getType(), "ADMIN_MOBILE_SMS"));
@@ -165,7 +161,6 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "授权code登录,如钉钉", description = "Anon")
     @LogOperation(value = "授权code登录", type = "login")
-    @ApiOperationSupport(order = 30)
     public Result<?> userLoginByCode(@Validated @RequestBody LoginByCodeReq req) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(StrUtil.blankToDefault(req.getType(), "ADMIN_DINGTALK_CODE"));
@@ -230,7 +225,6 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "发送验证码消息", description = "Anon")
     @LogOperation("发送验证码消息")
-    @ApiOperationSupport(order = 20)
     public Result<?> sendMsgCode(@Validated(value = {DefaultGroup.class}) @RequestBody MsgSendForm form) {
         MsgTplBody mailTpl = msgService.getTplByCode(form.getTenantCode(), form.getTplCode());
         AssertUtils.isNull(mailTpl, ErrorCode.ERROR_REQUEST, "消息模板不存在");
@@ -252,7 +246,6 @@ public class AuthController {
     @PostMapping("userLogout")
     @Operation(summary = "用户登出")
     @LogOperation(value = "用户登出", type = "logout")
-    @ApiOperationSupport(order = 120)
     public Result<?> userLogout() {
         String token = HttpContextUtils.getRequestParameter(authProps.getTokenHeaderKey());
         tokenService.deleteToken(token);
@@ -261,7 +254,6 @@ public class AuthController {
 
     @PostMapping("userInfo")
     @Operation(summary = "用户信息")
-    @ApiOperationSupport(order = 150)
     public Result<?> userInfo() {
         UserEntity user = userService.getById(ShiroUtils.getUserId());
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
@@ -275,7 +267,6 @@ public class AuthController {
     @PostMapping("userChangePassword")
     @Operation(summary = "用户修改密码")
     @LogOperation("用户修改密码")
-    @ApiOperationSupport(order = 160)
     public Result<?> userChangePassword(@Validated @RequestBody ChangePasswordReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
@@ -302,7 +293,6 @@ public class AuthController {
     @AccessControl
     @Operation(summary = "用户重置密码(帐号找回)")
     @LogOperation("用户重置密码(帐号找回)")
-    @ApiOperationSupport(order = 164)
     public Result<?> userResetPassword(@Validated @RequestBody ChangePasswordByMailCodeReq form) {
         // 获得对应登录类型的登录参数
         JSONObject loginParams = paramsService.getSystemPropsJson(form.getType());
@@ -330,7 +320,6 @@ public class AuthController {
 
     @PostMapping("userMenuScope")
     @Operation(summary = "用户权限范围", description = "返回包括菜单、路由、权限、角色等所有内容")
-    @ApiOperationSupport(order = 200)
     public Result<MenuScopeResult> userMenuScope(@Validated @RequestBody MenuScopeReq form) {
         ShiroUser user = ShiroUtils.getUser();
         // 过滤出其中显示菜单
@@ -379,7 +368,6 @@ public class AuthController {
 
     @PostMapping("userMenuTree")
     @Operation(summary = "用户菜单树", description = "用户左侧显示菜单")
-    @ApiOperationSupport(order = 230)
     public Result<?> userMenuTree() {
         ShiroUser user = ShiroUtils.getUser();
         List<TreeNode<Long>> menuList = new ArrayList<>();
@@ -397,7 +385,6 @@ public class AuthController {
 
     @PostMapping("userPermissions")
     @Operation(summary = "用户授权编码", description = "用户具备的权限,可用于按钮等的控制")
-    @ApiOperationSupport(order = 240)
     public Result<?> userPermissions() {
         ShiroUser user = ShiroUtils.getUser();
         List<String> set = userService.getUserPermissions(user);
@@ -407,7 +394,6 @@ public class AuthController {
 
     @PostMapping("userRoleIds")
     @Operation(summary = "用户角色id", description = "用户具备的角色,可用于按钮等的控制")
-    @ApiOperationSupport(order = 250)
     public Result<?> userRoles() {
         ShiroUser user = ShiroUtils.getUser();
         List<Long> set = userService.getUserRoleIds(user);
@@ -417,7 +403,6 @@ public class AuthController {
 
     @PostMapping("userRoleCodes")
     @Operation(summary = "用户角色编码", description = "用户具备的角色,可用于按钮等的控制")
-    @ApiOperationSupport(order = 250)
     public Result<?> userRoleCodes() {
         ShiroUser user = ShiroUtils.getUser();
         List<String> set = userService.getUserRoleCodes(user);

@@ -1,6 +1,5 @@
 package com.nb6868.onex.uc.controller;
 
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
@@ -45,7 +44,6 @@ public class RoleController {
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 10)
     public Result<?> page(@Validated({PageGroup.class}) @RequestBody RoleQueryReq form) {
         PageData<?> page = roleService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
@@ -56,7 +54,6 @@ public class RoleController {
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 20)
     public Result<?> list(@Validated @RequestBody RoleQueryReq form) {
         List<?> list = roleService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
@@ -66,7 +63,6 @@ public class RoleController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 30)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> info(@Validated @RequestBody IdReq req) {
         RoleDTO data = roleService.oneDto(QueryWrapperHelper.getPredicate(req));
@@ -83,7 +79,6 @@ public class RoleController {
     @Operation(summary = "新增或更新")
     @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 40)
     public Result<?> save(@Validated @RequestBody RoleSaveOrUpdateReq req) {
         RoleEntity entity = roleService.saveOrUpdateByReq(req);
         RoleDTO dto = ConvertUtils.sourceToTarget(entity, RoleDTO.class);
@@ -95,7 +90,6 @@ public class RoleController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:delete"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在

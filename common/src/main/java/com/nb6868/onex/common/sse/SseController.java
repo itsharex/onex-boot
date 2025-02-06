@@ -1,7 +1,6 @@
 package com.nb6868.onex.common.sse;
 
 import cn.hutool.json.JSONUtil;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
@@ -33,7 +32,6 @@ public class SseController {
     @PostMapping("sendOneMessage")
     @Operation(summary = "发送单点消息")
     @RequiresPermissions(value = {"admin:super", "admin:sse", "sys:sse:send"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 20)
     public Result<?> sendOneMessage(@Validated(value = {DefaultGroup.class, SseSendReq.SendOneGroup.class}) @RequestBody SseSendReq form) {
         sseEmitterService.sendOneMessage(form.getSid(), JSONUtil.parseObj(form.getContent()));
         return new Result<>();

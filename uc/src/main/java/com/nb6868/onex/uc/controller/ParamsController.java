@@ -1,7 +1,6 @@
 package com.nb6868.onex.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
@@ -47,7 +46,6 @@ public class ParamsController {
     @PostMapping("infoByCode")
     @AccessControl
     @Operation(summary = "通过编码获取配置信息")
-    @ApiOperationSupport(order = 5)
     public Result<?> infoByCode(@Validated @RequestBody ParamsInfoQueryReq form) {
         QueryWrapper<ParamsEntity> queryWrapper = QueryWrapperHelper.getPredicate(form);
         ParamsEntity data = paramsService.getOne(queryWrapper);
@@ -60,7 +58,6 @@ public class ParamsController {
     @Operation(summary = "列表")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 8)
     public Result<?> list(@RequestBody ParamsQueryReq form) {
         List<?> list = paramsService.listDto(QueryWrapperHelper.getPredicate(form, "list"));
 
@@ -71,7 +68,6 @@ public class ParamsController {
     @Operation(summary = "分页")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 10)
     public Result<?> page(@Validated({PageGroup.class}) @RequestBody ParamsQueryReq form) {
         PageData<?> page = paramsService.pageDto(form, QueryWrapperHelper.getPredicate(form, "page"));
 
@@ -82,7 +78,6 @@ public class ParamsController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    @ApiOperationSupport(order = 20)
     public Result<?> info(@Validated @RequestBody IdReq form) {
         ParamsDTO data = paramsService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
@@ -94,7 +89,6 @@ public class ParamsController {
     @Operation(summary = "保存")
     @LogOperation("保存")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 40)
     public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody ParamsDTO dto) {
         paramsService.saveDto(dto);
 
@@ -105,7 +99,6 @@ public class ParamsController {
     @Operation(summary = "修改")
     @LogOperation("修改")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:edit"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 50)
     public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody ParamsDTO dto) {
         paramsService.updateDto(dto);
 
@@ -116,7 +109,6 @@ public class ParamsController {
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:params:delete"}, logical = Logical.OR)
-    @ApiOperationSupport(order = 60)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         paramsService.remove(QueryWrapperHelper.getPredicate(req));
