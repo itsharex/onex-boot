@@ -1,5 +1,6 @@
 package com.nb6868.onex.job.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.exceptions.ExceptionUtil;
@@ -14,16 +15,17 @@ import com.nb6868.onex.job.JobConst;
 import com.nb6868.onex.job.dao.JobDao;
 import com.nb6868.onex.job.dto.JobDTO;
 import com.nb6868.onex.job.dto.JobRunWithParamsReq;
+import com.nb6868.onex.job.dto.JobSaveOrUpdateReq;
 import com.nb6868.onex.job.entity.JobEntity;
 import com.nb6868.onex.job.entity.JobLogEntity;
 import com.nb6868.onex.job.sched.AbstractJobRunService;
 import com.nb6868.onex.job.sched.JobRunResult;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -36,7 +38,29 @@ import java.util.List;
 public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
 
     @Autowired
-    private JobLogService jobLogService;
+    JobLogService jobLogService;
+
+    /**
+     * 新增或修改
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public JobEntity saveOrUpdateByReq(JobSaveOrUpdateReq req) {
+        // 检查请求
+        // 转换数据格式
+        JobEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+            BeanUtil.copyProperties(req, entity);
+        } else {
+            // 新增数据
+            entity = BeanUtil.copyProperties(req, JobEntity.class);
+        }
+        // 处理数据
+        saveOrUpdateById(entity);
+        return entity;
+    }
 
     /**
      * 修改状态
@@ -61,7 +85,7 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
         // 任务计时器
         TimeInterval timer = DateUtil.timer();
         // 记录初始化日志
-        Long jobLogId = jobLogService.saveLog(job, 0L, JobConst.JobLogState.INIT.getValue(), null);
+        Long jobLogId = jobLogService.saveLog(job, 0L, JobConst.JobLogStateEnum.INIT.getValue(), null);
         // 通过bean获取实现Service
         JobRunResult runResult;
         AbstractJobRunService jobRunService;
@@ -75,7 +99,7 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
             if (jobLogId > 0) {
                 jobLogService.update().set("error", ExceptionUtil.stacktraceToString(e))
                         .set("time_interval", timer.interval())
-                        .set("state", JobConst.JobLogState.ERROR.getValue())
+                        .set("state", JobConst.JobLogStateEnum.ERROR.getValue())
                         .eq("id", jobLogId)
                         .update(new JobLogEntity());
             }
@@ -84,12 +108,12 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
         if (jobLogId == 0 && runResult.getLogToDb()) {
             // 执行结果要求存入数据库
             job.setLogType("db");
-            jobLogService.saveLog(job, timer.interval(), JobConst.JobLogState.COMPLETED.getValue(), runResult.getResult().toString());
+            jobLogService.saveLog(job, timer.interval(), JobConst.JobLogStateEnum.COMPLETED.getValue(), runResult.getResult().toString());
         } else if (jobLogId > 0) {
             jobLogService.update()
                     .set("result", runResult.getResult().toString())
                     .set("time_interval", timer.interval())
-                    .set("state", JobConst.JobLogState.COMPLETED.getValue())
+                    .set("state", JobConst.JobLogStateEnum.COMPLETED.getValue())
                     .eq("id", jobLogId)
                     .update(new JobLogEntity());
         }

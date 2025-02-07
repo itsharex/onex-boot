@@ -61,8 +61,8 @@ public class WxMpTemplateMailService extends AbstractMailService {
             mailLog.setTitle(mailTpl.getTitle());
             mailLog.setContentParams(request.getContentParams());
             mailLog.setContent(request.getContentParams().toString());
-            mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-            mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+            mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+            mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
             // 设置有效时间
             int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
             mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -97,10 +97,10 @@ public class WxMpTemplateMailService extends AbstractMailService {
             try {
                 String sendResult = wxService.getTemplateMsgService().sendTemplateMsg(templateMessage);
                 mailLog.setResult(new JSONObject().set("errcode", 0).set("errmsg", "ok").set("msgid", sendResult).toString());
-                mailLog.setState(MsgConst.MailSendStateEnum.SUCCESS.value());
+                mailLog.setState(MsgConst.MailSendStateEnum.SUCCESS.getCode());
             } catch (WxErrorException e) {
                 mailLog.setResult(new JSONObject().set("errcode", e.getError()).set("errmsg", e.getMessage()).toString());
-                mailLog.setState(MsgConst.MailSendStateEnum.FAIL.value());
+                mailLog.setState(MsgConst.MailSendStateEnum.FAIL.getCode());
                 log.error("微信模板消息发送失败", e);
             }
             mailLogService.updateById(mailLog);

@@ -42,8 +42,8 @@ public class DingtalkNotifyMailService extends AbstractMailService {
         mailLog.setMailFrom("dingtalk_notify");
         mailLog.setMailTo(request.getMailTo());
         mailLog.setContentParams(params);
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -52,12 +52,12 @@ public class DingtalkNotifyMailService extends AbstractMailService {
         ApiResult<String> accessTokenResult = DingTalkApi.getOauth2AccessToken(mailTpl.getParams().getStr("AppKeyId"), mailTpl.getParams().getStr("AppKeySecret"), false);
         if (accessTokenResult.isSuccess()) {
             ApiResult<JSONObject> sendResult = DingTalkApi.sendNotifyMsg(accessTokenResult.getData(), params);
-            mailLog.setState(sendResult.isSuccess() ? MsgConst.MailSendStateEnum.SUCCESS.value() : MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState(sendResult.isSuccess() ? MsgConst.MailSendStateEnum.SUCCESS.getCode() : MsgConst.MailSendStateEnum.FAIL.getCode());
             mailLog.setResult(sendResult.getCodeMsg());
             mailLogService.updateById(mailLog);
             return sendResult.isSuccess();
         } else {
-            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.getCode());
             mailLog.setResult(accessTokenResult.getCodeMsg());
             return false;
         }

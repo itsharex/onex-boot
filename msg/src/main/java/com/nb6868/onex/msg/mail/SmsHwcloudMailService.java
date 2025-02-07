@@ -66,10 +66,10 @@ public class SmsHwcloudMailService extends AbstractMailService {
         mailLog.setMailFrom("sms_hwcloud");
         mailLog.setMailTo(request.getMailTo());
         mailLog.setContentParams(request.getContentParams());
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
         // 存入塞入后的内容
         mailLog.setContent(StrUtil.format(mailTpl.getContent(), request.getContentParams(), true));
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -124,14 +124,14 @@ public class SmsHwcloudMailService extends AbstractMailService {
                     .body();
             JSONObject resultJson = JSONUtil.parseObj(result);
             mailLog.setResult(result);
-            mailLog.setState("000000".equalsIgnoreCase(resultJson.getStr("code")) ? MsgConst.MailSendStateEnum.SUCCESS.value() : MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState("000000".equalsIgnoreCase(resultJson.getStr("code")) ? MsgConst.MailSendStateEnum.SUCCESS.getCode() : MsgConst.MailSendStateEnum.FAIL.getCode());
         } catch (Exception e) {
             log.error("HwcloudSms", e);
-            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.getCode());
             mailLog.setResult(e.getMessage());
         }
         mailLogService.updateById(mailLog);
-        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.value();
+        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.getCode();
     }
 
     /**

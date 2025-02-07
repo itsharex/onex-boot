@@ -67,7 +67,7 @@ public class AuthService {
         // String passwordPlaintext = PasswordUtils.aesDecode(form.getPasswordEncrypted(), StrUtil.emptyToDefault(authProps.getTransferKey(), Const.AES_KEY));
         boolean passwordVerify = PasswordUtils.verify(password, user.getPassword());
         // 判断用户状态
-        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.getCode(), ErrorCode.ACCOUNT_DISABLE);
         if (!passwordVerify) {
             // 密码错误
             if (loginParams.getBool("passwordErrorLock", false)) {
@@ -78,7 +78,7 @@ public class AuthService {
                 if (continuousLoginErrorTimes >= passwordErrorMaxTimes - 1) {
                     // 锁定用户
                     ChangeStateReq changeStateForm = new ChangeStateReq();
-                    changeStateForm.setState(UcConst.UserStateEnum.DISABLE.value());
+                    changeStateForm.setState(UcConst.UserStateEnum.DISABLE.getCode());
                     changeStateForm.setId(user.getId());
                     userService.changeState(changeStateForm);
                     throw new OnexException(ErrorCode.ACCOUNT_PASSWORD_ERROR, StrUtil.format("{}分钟内密码连续错误超过{}次,您的账户已被锁定,请联系管理员", passwordErrorMinuteOffset, passwordErrorMaxTimes));
@@ -106,7 +106,7 @@ public class AuthService {
         UserEntity user = userService.getByMobile(tenantCode, mobile);
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR);
         // 判断用户状态
-        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.getCode(), ErrorCode.ACCOUNT_DISABLE);
         // 验证并将短信消费掉
         msgService.verifyMailCode(tenantCode, loginParams.getStr("mailTplCode", "CODE_LOGIN"), mobile, sms);
         return user;

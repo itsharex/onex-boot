@@ -60,7 +60,7 @@ public class AuthQrcodeController {
         UserEntity user = userService.getById(userId);
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
         // 判断用户状态
-        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.getCode(), ErrorCode.ACCOUNT_DISABLE);
 
         // 创建token
         String token = tokenService.createToken(user,

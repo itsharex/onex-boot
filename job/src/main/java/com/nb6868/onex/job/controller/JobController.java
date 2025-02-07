@@ -8,16 +8,11 @@ import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
-import com.nb6868.onex.job.dto.JobDTO;
-import com.nb6868.onex.job.dto.JobLogDTO;
-import com.nb6868.onex.job.dto.JobLogQueryReq;
-import com.nb6868.onex.job.dto.JobQueryReq;
-import com.nb6868.onex.job.dto.JobRunWithParamsReq;
+import com.nb6868.onex.job.dto.*;
+import com.nb6868.onex.job.entity.JobEntity;
 import com.nb6868.onex.job.service.JobLogService;
 import com.nb6868.onex.job.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,33 +51,24 @@ public class JobController {
     @Operation(summary = "详情")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:job:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<JobDTO> info(@Validated @RequestBody IdReq form) {
         JobDTO data = jobService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<JobDTO>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:job:edit"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody JobDTO dto) {
-        jobService.saveDto(dto);
-
+    public Result<?> saveOrUpdate(@Validated @RequestBody JobSaveOrUpdateReq req) {
+        JobEntity entity = jobService.saveOrUpdateByReq(req);
+        JobDTO dto = ConvertUtils.sourceToTarget(entity, JobDTO.class);
         return new Result<>().success(dto);
     }
 
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:job", "sys:job:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody JobDTO dto) {
-        jobService.updateDto(dto);
-
-        return new Result<>().success(dto);
-    }
 
     @PostMapping("delete")
     @Operation(summary = "删除")
@@ -90,8 +76,8 @@ public class JobController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:job:delete"}, logical = Logical.OR)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
-        JobDTO data = jobService.oneDto(QueryWrapperHelper.getPredicate(req));
-        AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
+        // 判断数据是否存在
+        AssertUtils.isFalse(jobService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         // 删除数据
         jobService.remove(QueryWrapperHelper.getPredicate(req));
         return new Result<>();
@@ -121,11 +107,11 @@ public class JobController {
     @Operation(summary = "日志详情")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:jobLog:query"}, logical = Logical.OR)
-    public Result<?> logInfo(@Validated @RequestBody IdReq form) {
+    public Result<JobLogDTO> logInfo(@Validated @RequestBody IdReq form) {
         JobLogDTO data = jobLogService.getDtoById(form.getId());
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<JobLogDTO>().success(data);
     }
 
     @PostMapping("logDeleteBatch")

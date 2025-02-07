@@ -54,11 +54,11 @@ public class CalendarController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:calendar", "sys:calendar:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody CalenderDayDateReq form) {
+    public Result<CalendarDTO> info(@Validated @RequestBody CalenderDayDateReq form) {
         CalendarDTO data = calendarService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<CalendarDTO>().success(data);
     }
 
 }

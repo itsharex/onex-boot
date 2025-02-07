@@ -60,11 +60,11 @@ public class TenantController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<TenantDTO> info(@Validated @RequestBody IdReq form) {
         TenantDTO data = tenantService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<TenantDTO>().success(data);
     }
 
     @PostMapping("save")

@@ -49,11 +49,11 @@ public class LogController {
     @PostMapping("info")
     @Operation(summary = "详情")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:log", "sys:log:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody IdReq req) {
+    public Result<LogDTO> info(@Validated @RequestBody IdReq req) {
         LogDTO date = logService.getDtoById(req.getId());
         AssertUtils.isNull(date, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(date);
+        return new Result<LogDTO>().success(date);
     }
 
     @PostMapping("deleteBatch")

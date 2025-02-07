@@ -1,5 +1,11 @@
 package com.nb6868.onex.msg;
 
+import cn.hutool.core.util.ObjUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.stream.Stream;
+
 /**
  * 消息模块常量
  *
@@ -37,6 +43,8 @@ public interface MsgConst {
     /**
      * 消息渠道类型
      */
+    @Getter
+    @AllArgsConstructor
     enum MailChannelEnum {
 
         /**
@@ -50,15 +58,13 @@ public interface MsgConst {
 
         private String code;
 
-        MailChannelEnum(String code) {
-            this.code = code;
-        }
-
     }
 
     /**
      * 消息类型
      */
+    @Getter
+    @AllArgsConstructor
     enum MailTypeEnum {
 
         /**
@@ -68,22 +74,31 @@ public interface MsgConst {
         NOTIFY(2, "通知"),
         ADV(3, "营销广告");
 
-        private Integer value;
-        private String name;
+        private int code;
+        private String title;
 
-        MailTypeEnum(Integer value, String name) {
-            this.value = value;
-            this.name = name;
+        public static MailTypeEnum findByCode(Integer codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
-        public int value() {
-            return this.value;
+        public static String getTitleByCode(Integer codeValue) {
+            MailTypeEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
+        }
+
+        public static boolean isValid(Integer codeValue) {
+            return findByCode(codeValue) != null;
         }
     }
 
     /**
      * 消息发送状态
      */
+    @Getter
+    @AllArgsConstructor
     enum MailSendStateEnum {
 
         /**
@@ -95,16 +110,23 @@ public interface MsgConst {
         CALLBACK_SUCCESS(10, "发送回调成功"),
         CALLBACK_FAIL(-10, "发送回调失败");
 
-        private Integer value;
-        private String name;
+        private int code;
+        private String title;
 
-        MailSendStateEnum(Integer value, String name) {
-            this.value = value;
-            this.name = name;
+        public static MailSendStateEnum findByCode(Integer codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
-        public int value() {
-            return this.value;
+        public static String getTitleByCode(Integer codeValue) {
+            MailSendStateEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
+        }
+
+        public static boolean isValid(Integer codeValue) {
+            return findByCode(codeValue) != null;
         }
     }
 

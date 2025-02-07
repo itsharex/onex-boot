@@ -64,7 +64,7 @@ public class RoleController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdReq req) {
+    public Result<RoleDTO> info(@Validated @RequestBody IdReq req) {
         RoleDTO data = roleService.oneDto(QueryWrapperHelper.getPredicate(req));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
@@ -72,14 +72,14 @@ public class RoleController {
         List<Long> menuIdList = menuScopeService.getMenuIdListByRoleId(data.getId());
         data.setMenuIdList(menuIdList);
 
-        return new Result<>().success(data);
+        return new Result<RoleDTO>().success(data);
     }
 
     @PostMapping("saveOrUpdate")
     @Operation(summary = "新增或更新")
     @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:role:edit"}, logical = Logical.OR)
-    public Result<?> save(@Validated @RequestBody RoleSaveOrUpdateReq req) {
+    public Result<?> saveOrUpdate(@Validated @RequestBody RoleSaveOrUpdateReq req) {
         RoleEntity entity = roleService.saveOrUpdateByReq(req);
         RoleDTO dto = ConvertUtils.sourceToTarget(entity, RoleDTO.class);
 

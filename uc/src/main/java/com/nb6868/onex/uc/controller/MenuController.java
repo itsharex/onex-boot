@@ -65,13 +65,12 @@ public class MenuController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:menu:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<MenuDTO> info(@Validated @RequestBody IdReq form) {
         MenuDTO data = menuService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 赋值父菜单
         data.setParentMenuList(menuService.getParentList(data.getPid()));
-
-        return new Result<>().success(data);
+        return new Result<MenuDTO>().success(data);
     }
 
     @PostMapping("saveOrUpdate")
@@ -92,8 +91,7 @@ public class MenuController {
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据
-        MenuEntity data = menuService.getById(req.getId());
-        AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
+        AssertUtils.isFalse(menuService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         // 级联删除菜单以及下面所有子菜单
         menuService.deleteAllCascadeById(req.getId());
         return new Result<>();

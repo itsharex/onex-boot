@@ -1,15 +1,16 @@
 package com.nb6868.onex.sys.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.nb6868.onex.common.exception.ErrorCode;
+import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.sys.dao.RegionDao;
 import com.nb6868.onex.sys.dto.RegionDTO;
 import com.nb6868.onex.sys.dto.RegionPcdt;
+import com.nb6868.onex.sys.dto.RegionSaveOrUpdateReq;
 import com.nb6868.onex.sys.entity.RegionEntity;
-import com.nb6868.onex.common.jpa.DtoService;
-import com.nb6868.onex.common.util.WrapperUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -20,6 +21,28 @@ import java.util.Map;
  */
 @Service
 public class RegionService extends DtoService<RegionDao, RegionEntity, RegionDTO> {
+
+    /**
+     * 新增或修改
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public RegionEntity saveOrUpdateByReq(RegionSaveOrUpdateReq req) {
+        // 检查请求
+        // 转换数据格式
+        RegionEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+            BeanUtil.copyProperties(req, entity);
+        } else {
+            // 新增数据
+            entity = BeanUtil.copyProperties(req, RegionEntity.class);
+        }
+        // 处理数据
+        saveOrUpdateById(entity);
+        return entity;
+    }
 
     /**
      * 通过id获得pcdt

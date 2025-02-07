@@ -7,13 +7,13 @@ import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.sys.dto.DictDTO;
 import com.nb6868.onex.sys.dto.DictQueryReq;
+import com.nb6868.onex.sys.dto.DictSaveOrUpdateReq;
+import com.nb6868.onex.sys.entity.DictEntity;
 import com.nb6868.onex.sys.service.DictService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +21,10 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,7 +35,7 @@ import java.util.List;
 public class DictController {
 
     @Autowired
-    private DictService dictService;
+    DictService dictService;
 
     @PostMapping("page")
     @Operation(summary = "字典分类")
@@ -62,24 +65,14 @@ public class DictController {
         return new Result<DictDTO>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:edit"}, logical = Logical.OR)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody DictDTO dto) {
-        dictService.saveDto(dto);
-
-        return new Result<>();
-    }
-
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody DictDTO dto) {
-        dictService.updateDto(dto);
-
-        return new Result<>();
+    public Result<?> saveOrUpdate(@Validated @RequestBody DictSaveOrUpdateReq req) {
+        DictEntity entity = dictService.saveOrUpdateByReq(req);
+        DictDTO dto = ConvertUtils.sourceToTarget(entity, DictDTO.class);
+        return new Result<>().success(dto);
     }
 
     @PostMapping("delete")
@@ -87,6 +80,8 @@ public class DictController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
+        // 判断数据是否存在
+        AssertUtils.isFalse(dictService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         dictService.remove(QueryWrapperHelper.getPredicate(req));
 
         return new Result<>();
@@ -98,7 +93,6 @@ public class DictController {
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
     public Result<?> deleteBatch(@Validated @RequestBody IdsReq req) {
         dictService.remove(QueryWrapperHelper.getPredicate(req));
-
         return new Result<>();
     }
 

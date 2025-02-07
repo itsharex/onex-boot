@@ -42,9 +42,8 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
     public MenuEntity saveOrUpdateByReq(MenuSaveOrUpdateReq req) {
         // 检查请求
         // 检查父菜单
-        if (req.getPid() != 0) {
-            boolean pMenuExisted = lambdaQuery().eq(MenuEntity::getId, req.getPid()).exists();
-            AssertUtils.isFalse(pMenuExisted, "上级不存在");
+        if (req.getPid() != 0L) {
+            AssertUtils.isFalse(lambdaQuery().eq(MenuEntity::getId, req.getPid()).exists(), "上级不存在");
         }
         // 转换数据格式
         MenuEntity entity;
@@ -78,7 +77,7 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
      * @param userId 用户id
      */
     public List<MenuEntity> getListByUser(Integer userType, String tenantCode, Long userId, Integer menuType, Integer showMenu) {
-        if (userType == UcConst.UserTypeEnum.SUPER_ADMIN.value() || userType == UcConst.UserTypeEnum.TENANT_ADMIN.value()) {
+        if (userType == UcConst.UserTypeEnum.SUPER_ADMIN.getCode() || userType == UcConst.UserTypeEnum.TENANT_ADMIN.getCode()) {
             // 系统/租户管理员
             // 获得对应租户下所有菜单内容
             return lambdaQuery().eq(menuType != null, MenuEntity::getType, menuType)
@@ -169,7 +168,7 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
             listByIds(menuIds).forEach(menu -> {
                 //保存角色菜单关系
                 MenuScopeEntity menuScope = new MenuScopeEntity();
-                menuScope.setType(UcConst.MenuScopeTypeEnum.ROLE.value());
+                menuScope.setType(UcConst.MenuScopeTypeEnum.ROLE.getCode());
                 menuScope.setMenuId(menu.getId());
                 menuScope.setMenuPermissions(menu.getPermissions());
                 menuScope.setRoleId(roleId);
@@ -193,7 +192,7 @@ public class MenuService extends DtoService<MenuDao, MenuEntity, MenuDTO> {
             //保存用户菜单关系
             listByIds(menuIds).forEach(menu -> {
                 MenuScopeEntity menuScope = new MenuScopeEntity();
-                menuScope.setType(UcConst.MenuScopeTypeEnum.USER.value());
+                menuScope.setType(UcConst.MenuScopeTypeEnum.USER.getCode());
                 menuScope.setMenuId(menu.getId());
                 menuScope.setMenuPermissions(menu.getPermissions());
                 menuScope.setUserId(userId);

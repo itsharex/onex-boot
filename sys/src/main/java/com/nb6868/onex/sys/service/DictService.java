@@ -1,13 +1,20 @@
 package com.nb6868.onex.sys.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import com.nb6868.onex.common.Const;
+import com.nb6868.onex.common.exception.ErrorCode;
+import com.nb6868.onex.common.jpa.DtoService;
+import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.sys.dao.DictDao;
 import com.nb6868.onex.sys.dto.DictDTO;
+import com.nb6868.onex.sys.dto.DictSaveOrUpdateReq;
 import com.nb6868.onex.sys.entity.DictEntity;
-import com.nb6868.onex.common.Const;
-import com.nb6868.onex.common.jpa.DtoService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.nb6868.onex.common.Const.LIMIT_ONE;
 
@@ -19,12 +26,34 @@ import static com.nb6868.onex.common.Const.LIMIT_ONE;
 @Service
 public class DictService extends DtoService<DictDao, DictEntity, DictDTO> {
 
-    @Override
-    protected void beforeSaveOrUpdateDto(DictDTO dto, int type) {
-        if (type == 1 && dto.getPid() == Const.DICT_ROOT.longValue()) {
-            // 更新下面所有的父类
-            update().eq("pid", dto.getId()).set("type", dto.getType()).update(new DictEntity());
+    /**
+     * 新增或修改
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public DictEntity saveOrUpdateByReq(DictSaveOrUpdateReq req) {
+        // 检查请求
+        if (!Objects.equals(req.getPid(), Const.DICT_ROOT)) {
+            AssertUtils.isFalse(lambdaQuery().eq(DictEntity::getId, req.getPid()).exists(), "上级不存在");
         }
+        // 转换数据格式
+        DictEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+            BeanUtil.copyProperties(req, entity);
+            // 更新的时候,同时更新子类信息
+            if (Objects.equals(req.getPid(), Const.DICT_ROOT) && !StrUtil.equals(entity.getType(), req.getType())) {
+                lambdaUpdate().eq(DictEntity::getPid, req.getId()).set(DictEntity::getType, req.getType()).update(new DictEntity());
+            }
+        } else {
+            // 新增数据
+            // todo 只有root可以设置type
+            entity = BeanUtil.copyProperties(req, DictEntity.class);
+        }
+        // 处理数据
+        saveOrUpdateById(entity);
+        return entity;
     }
 
     /**

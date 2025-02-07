@@ -58,8 +58,8 @@ public class WxMaSubscribeMailService extends AbstractMailService {
             mailLog.setTitle(mailTpl.getTitle());
             mailLog.setContentParams(request.getContentParams());
             mailLog.setContent(request.getContentParams().toString());
-            mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-            mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+            mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+            mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
             // 设置有效时间
             int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
             mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));

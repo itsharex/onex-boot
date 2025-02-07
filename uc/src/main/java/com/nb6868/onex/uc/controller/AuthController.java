@@ -190,14 +190,14 @@ public class AuthController {
                 user.setOauthInfo(JSONUtil.parseObj(userContact.getData()));
                 user.setMobile(userContact.getData().getStr("mobile"));
                 user.setAvatar(userContact.getData().getStr("avatarUrl"));
-                user.setType(UcConst.UserTypeEnum.DEPT_ADMIN.value());
-                user.setState(UcConst.UserStateEnum.ENABLED.value());
+                user.setType(UcConst.UserTypeEnum.DEPT_ADMIN.getCode());
+                user.setState(UcConst.UserStateEnum.ENABLED.getCode());
                 user.setTenantCode(req.getTenantCode());
                 AssertUtils.isTrue(userService.hasDuplicated(null, "username", user.getUsername()), ErrorCode.ERROR_REQUEST, "用户名已存在");
                 // AssertUtils.isTrue(userService.hasDuplicated(null, "mobile", user.getMobile()), ErrorCode.ERROR_REQUEST, "手机号已存在");
                 userService.save(user);
                 // 保存角色关系
-                roleUserService.saveOrUpdateByUserIdAndRoleIds(user.getId(), loginParams.getBeanList("autoCreateUserRoleIds", Long.class), UcConst.RoleUserTypeEnum.DEFAULT.value());
+                roleUserService.saveOrUpdateByUserIdAndRoleIds(user.getId(), loginParams.getBeanList("autoCreateUserRoleIds", Long.class), UcConst.RoleUserTypeEnum.DEFAULT.getCode());
             } else {
                 return new Result<>().error("用户未注册");
             }
@@ -205,7 +205,7 @@ public class AuthController {
         // 判断用户是否存在
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
         // 判断用户状态
-        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+        AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.getCode(), ErrorCode.ACCOUNT_DISABLE);
         // 创建token
         String token = tokenService.createToken(user,
                 loginParams.getStr(AuthConst.TOKEN_STORE_TYPE_KEY, AuthConst.TOKEN_STORE_TYPE_VALUE),
@@ -232,7 +232,7 @@ public class AuthController {
             // 是否先验证用户是否存在
             UserEntity user = userService.getByMobile(form.getTenantCode(), form.getMailTo());
             AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
-            AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.value(), ErrorCode.ACCOUNT_DISABLE);
+            AssertUtils.isFalse(user.getState() == UcConst.UserStateEnum.ENABLED.getCode(), ErrorCode.ACCOUNT_DISABLE);
         }
         // 结果标记
         boolean flag = msgService.sendMail(form);

@@ -47,8 +47,8 @@ public class DingtalkRobotMailService extends AbstractMailService {
         mailLog.setMailFrom("dingtalk_robot");
         mailLog.setMailTo(request.getMailTo());
         mailLog.setContentParams(request.getContentParams());
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -56,7 +56,7 @@ public class DingtalkRobotMailService extends AbstractMailService {
 
         // https://oapi.dingtalk.com/robot/send?access_token=xxxx
         ApiResult<JSONObject> sendResponse = DingTalkApi.sendRobotMsg(mailTpl.getParams().getStr("AccessToken"), request.getContentParams());
-        mailLog.setState(sendResponse.isSuccess() ? MsgConst.MailSendStateEnum.SUCCESS.value() : MsgConst.MailSendStateEnum.FAIL.value());
+        mailLog.setState(sendResponse.isSuccess() ? MsgConst.MailSendStateEnum.SUCCESS.getCode() : MsgConst.MailSendStateEnum.FAIL.getCode());
         mailLog.setResult(sendResponse.getCodeMsg());
         mailLogService.updateById(mailLog);
 

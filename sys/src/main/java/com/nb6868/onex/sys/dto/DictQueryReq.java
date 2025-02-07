@@ -12,10 +12,10 @@ import lombok.EqualsAndHashCode;
 public class DictQueryReq extends PageReq {
 
     @Query
-    @Schema(description = "深度")
-    private Integer deep;
+    @Schema(description = "PID")
+    private Long pid;
 
-    @Query(blurryType = Query.BlurryType.OR, type = Query.Type.LIKE, column = "name,code,pcode")
+    @Query(blurryType = Query.BlurryType.OR, type = Query.Type.LIKE, column = "name,code,value,remark")
     @Schema(description = "搜索关键词")
     private String search;
 

@@ -10,14 +10,15 @@ import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.util.TreeNodeUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.sys.dto.RegionDTO;
 import com.nb6868.onex.sys.dto.RegionQueryReq;
+import com.nb6868.onex.sys.dto.RegionSaveOrUpdateReq;
 import com.nb6868.onex.sys.entity.RegionEntity;
 import com.nb6868.onex.sys.service.RegionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,10 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +45,9 @@ import java.util.List;
 @Validated
 @Tag(name = "行政区域")
 public class RegionController {
+
     @Autowired
-    private RegionService regionService;
+    RegionService regionService;
 
     @PostMapping("tree")
     @Operation(summary = "树表")
@@ -77,40 +82,34 @@ public class RegionController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:region", "sys:region:query"}, logical = Logical.OR)
-    public Result<?>info(@Validated @RequestBody IdReq form) {
+    public Result<RegionDTO>info(@Validated @RequestBody IdReq form) {
         RegionDTO data = regionService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<RegionDTO>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:region", "sys:region:edit"}, logical = Logical.OR)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody RegionDTO dto) {
-        regionService.saveDto(dto);
-
+    public Result<?> saveOrUpdate(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody RegionSaveOrUpdateReq req) {
+        RegionEntity entity = regionService.saveOrUpdateByReq(req);
+        RegionDTO dto = ConvertUtils.sourceToTarget(entity, RegionDTO.class);
         return new Result<>().success(dto);
     }
 
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:region", "sys:region:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody RegionDTO dto) {
-        regionService.updateDto(dto);
-
-        return new Result<>().success(dto);
-    }
 
     @PostMapping("delete")
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:region", "sys:region:delete"}, logical = Logical.OR)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
+        // 判断数据是否存在
+        AssertUtils.isFalse(regionService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         regionService.remove(QueryWrapperHelper.getPredicate(req));
-
+        // 删除子数据
+        regionService.remove(regionService.lambdaQuery().likeRight(RegionEntity::getId, req.getId()).getWrapper());
         return new Result<>();
     }
 

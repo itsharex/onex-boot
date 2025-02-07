@@ -30,7 +30,7 @@ public class CalendarService extends DtoService<CalendarDao, CalendarEntity, Cal
     public boolean isWorkday(String day) {
         CalendarEntity calendarEntity = getOneByColumn("day_date", day);
         AssertUtils.isNull(calendarEntity, "日期超出数据库内数据范围:" + day);
-        return calendarEntity.getType() == SysConst.CalenderTypeEnum.WORKDAY.value() || calendarEntity.getType() == SysConst.CalenderTypeEnum.HOLIDAY_EXCHANGE.value();
+        return calendarEntity.getType() == SysConst.CalenderTypeEnum.WORKDAY.getCode() || calendarEntity.getType() == SysConst.CalenderTypeEnum.HOLIDAY_EXCHANGE.getCode();
     }
 
     /**

@@ -74,7 +74,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
         // 检查用户权限
         ShiroUser user = ShiroUtils.getUser();
         AssertUtils.isTrue(user.getType() > dto.getType(), "无权创建高等级用户");
-        AssertUtils.isTrue(dto.getType() == UcConst.UserTypeEnum.DEPT_ADMIN.value() && StrUtil.isEmpty(dto.getDeptCode()), "单位管理员需指定所在单位");
+        AssertUtils.isTrue(dto.getType() == UcConst.UserTypeEnum.DEPT_ADMIN.getCode() && StrUtil.isEmpty(dto.getDeptCode()), "单位管理员需指定所在单位");
         // AssertUtils.isTrue(user.getDeptId() != null && dto.getDeptId() == null, "需指定所在单位");
         AssertUtils.isTrue(hasDuplicated(dto.getId(), "username", dto.getUsername()), ErrorCode.ERROR_REQUEST, "用户名已存在");
         AssertUtils.isTrue(hasDuplicated(dto.getId(), "mobile", dto.getMobile()), ErrorCode.ERROR_REQUEST, "手机号已存在");
@@ -94,7 +94,7 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
     protected void afterSaveOrUpdateDto(boolean ret, UserDTO dto, UserEntity existedEntity, int type) {
         if (ret) {
             // 保存角色用户关系
-            roleUserService.saveOrUpdateByUserIdAndRoleIds(dto.getId(), dto.getRoleIds(), UcConst.RoleUserTypeEnum.DEFAULT.value());
+            roleUserService.saveOrUpdateByUserIdAndRoleIds(dto.getId(), dto.getRoleIds(), UcConst.RoleUserTypeEnum.DEFAULT.getCode());
         }
     }
 
@@ -148,10 +148,10 @@ public class UserService extends DtoService<UserDao, UserEntity, UserDTO> {
     public boolean changeState(ChangeStateReq form) {
         boolean ret = update().set("state", form.getState()).eq("id", form.getId()).update(new UserEntity());
         if (ret) {
-            if (form.getState() == UcConst.UserStateEnum.DISABLE.value()) {
+            if (form.getState() == UcConst.UserStateEnum.DISABLE.getCode()) {
                 // 锁定用户,将token注销
                 tokenService.deleteByUserIdList(Collections.singletonList(form.getId()));
-            } else if (form.getState() == UcConst.UserStateEnum.ENABLED.value()) {
+            } else if (form.getState() == UcConst.UserStateEnum.ENABLED.getCode()) {
                 // 激活用户
             }
         }

@@ -102,14 +102,14 @@ public class UserController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:user:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<UserDTO> info(@Validated @RequestBody IdReq form) {
         UserDTO data = userService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
         // 用户角色列表
         data.setRoleIds(roleService.getRoleIdListByUserId(form.getId()));
         // 部门树
         data.setDeptChain(deptService.getParentChain(data.getDeptCode()));
-        return new Result<>().success(data);
+        return new Result<UserDTO>().success(data);
     }
 
     @PostMapping("save")

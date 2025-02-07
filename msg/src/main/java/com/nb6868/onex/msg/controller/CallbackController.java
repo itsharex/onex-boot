@@ -43,7 +43,7 @@ public class CallbackController {
         // 用扩展码对应数据
         MsgLogEntity msgLog = msgLogService.getById(extend);
         AssertUtils.isNull(msgLog, ErrorCode.DB_RECORD_NOT_EXISTED);
-        AssertUtils.isFalse(msgLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.value(), "短信状态异常");
+        AssertUtils.isFalse(msgLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.getCode(), "短信状态异常");
         // 用smsMsgId做校验认证
         try {
             boolean smsMsgIdMatched = false;

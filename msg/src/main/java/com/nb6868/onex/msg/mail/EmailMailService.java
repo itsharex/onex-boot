@@ -7,8 +7,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.extra.template.engine.freemarker.FreemarkerEngine;
 import cn.hutool.json.JSONObject;
-import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.Const;
+import com.nb6868.onex.common.msg.MsgSendForm;
 import com.nb6868.onex.common.util.MultipartFileUtils;
 import com.nb6868.onex.common.util.TemplateUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
@@ -79,8 +79,8 @@ public class EmailMailService extends AbstractMailService {
         mailLog.setMailCc(request.getMailCc());
         mailLog.setTitle(title);
         mailLog.setContent(content);
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -114,14 +114,13 @@ public class EmailMailService extends AbstractMailService {
             //发送邮件
             mailSender.send(mimeMessage);
             // 保存记录
-            mailLog.setState(MsgConst.MailSendStateEnum.SUCCESS.value());
+            mailLog.setState(MsgConst.MailSendStateEnum.SUCCESS.getCode());
         } catch (Exception e) {
             log.error("send error", e);
-            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.getCode());
             mailLog.setResult(e.getMessage());
         }
-
         mailLogService.updateById(mailLog);
-        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.value();
+        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.getCode();
     }
 }

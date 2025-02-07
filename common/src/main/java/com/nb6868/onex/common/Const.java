@@ -1,5 +1,11 @@
 package com.nb6868.onex.common;
 
+import cn.hutool.core.util.ObjUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.stream.Stream;
+
 /**
  * 常量
  *
@@ -96,6 +102,8 @@ public interface Const {
     /**
      * 结果枚举
      */
+    @Getter
+    @AllArgsConstructor
     enum ResultEnum {
 
         /**
@@ -104,28 +112,27 @@ public interface Const {
         SUCCESS(1, "成功"),
         FAIL(0, "失败");
 
-        private int value;
-        private String name;
+        private int code;
+        private String title;
 
-        ResultEnum(int value) {
-            this.value = value;
-        }
-
-        ResultEnum(int value, String name) {
-            this.value = value;
-            this.name = name;
-        }
-
-        public int value() {
-            return this.value;
-        }
-
-        public String getName() {
-            return this.name;
+        public static ResultEnum findByCode(Integer codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
         public static ResultEnum getByBoolean(boolean ret) {
             return ret ? SUCCESS : FAIL;
+        }
+
+        public static String getTitleByCode(Integer codeValue) {
+            ResultEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
+        }
+
+        public static boolean isValid(Integer codeValue) {
+            return findByCode(codeValue) != null;
         }
 
     }
@@ -133,6 +140,8 @@ public interface Const {
     /**
      * 二元布尔枚举
      */
+    @Getter
+    @AllArgsConstructor
     enum BooleanEnum {
 
         /**
@@ -141,28 +150,27 @@ public interface Const {
         TRUE(1, "是"),
         FALSE(0, "否");
 
-        private int value;
-        private String name;
+        private int code;
+        private String title;
 
-        BooleanEnum(int value) {
-            this.value = value;
-        }
-
-        BooleanEnum(int value, String name) {
-            this.value = value;
-            this.name = name;
-        }
-
-        public int value() {
-            return this.value;
-        }
-
-        public String getName() {
-            return this.name;
+        public static BooleanEnum findByCode(Integer codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
         public static BooleanEnum getByBoolean(boolean ret) {
             return ret ? TRUE : FALSE;
+        }
+
+        public static String getTitleByCode(Integer codeValue) {
+            BooleanEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
+        }
+
+        public static boolean isValid(Integer codeValue) {
+            return findByCode(codeValue) != null;
         }
 
     }

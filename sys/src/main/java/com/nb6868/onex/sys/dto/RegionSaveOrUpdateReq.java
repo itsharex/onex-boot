@@ -1,29 +1,15 @@
 package com.nb6868.onex.sys.dto;
 
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
+import com.nb6868.onex.common.pojo.BaseIdReq;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-
-import java.io.Serializable;
-
-/**
- * 行政区域
- *
- * @author Charles zhangchaoxu@gmail.com
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Schema(name = "行政区域")
-public class RegionDTO implements Serializable {
+public class RegionSaveOrUpdateReq extends BaseIdReq {
     private static final long serialVersionUID = 1L;
-
-    @Schema(description = "id")
-    private Long id;
 
     @Schema(description = "上级区域编号,0为一级")
     private Long pid;

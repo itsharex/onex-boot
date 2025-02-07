@@ -53,8 +53,8 @@ public class SmsJuheMailService extends AbstractMailService {
         mailLog.setMailTo(request.getMailTo());
         mailLog.setContent(StrUtil.format(mailTpl.getContent(), request.getContentParams()));
         mailLog.setContentParams(request.getContentParams());
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -71,15 +71,15 @@ public class SmsJuheMailService extends AbstractMailService {
             String result = HttpUtil.get(url);
             JSONObject resultJson = JSONUtil.parseObj(result);
             mailLog.setResult(result);
-            mailLog.setState((resultJson.getInt("error_code") == 0 ? MsgConst.MailSendStateEnum.SUCCESS.value() : MsgConst.MailSendStateEnum.FAIL.value()));
+            mailLog.setState((resultJson.getInt("error_code") == 0 ? MsgConst.MailSendStateEnum.SUCCESS.getCode() : MsgConst.MailSendStateEnum.FAIL.getCode()));
         } catch (Exception e) {
             // 接口调用失败
             log.error("JuheSms", e);
-            mailLog.setState(Const.ResultEnum.FAIL.value());
+            mailLog.setState(Const.ResultEnum.FAIL.getCode());
             mailLog.setResult(e.getMessage());
         }
         mailLogService.updateById(mailLog);
-        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.value();
+        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.getCode();
     }
 
 }

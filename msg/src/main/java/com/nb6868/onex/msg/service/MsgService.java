@@ -50,7 +50,7 @@ public class MsgService implements BaseMsgService {
         return msgLogService
                 .lambdaUpdate()
                 .eq(MsgLogEntity::getId, logId)
-                .set(MsgLogEntity::getConsumeState, Const.BooleanEnum.TRUE.value())
+                .set(MsgLogEntity::getConsumeState, Const.BooleanEnum.TRUE.getCode())
                 .update(new MsgLogEntity());
     }
 
@@ -62,8 +62,8 @@ public class MsgService implements BaseMsgService {
         MsgLogEntity msgLog = msgLogService.query().eq("tpl_code", tplCode)
                 .eq("mail_to", mailTo)
                 .eq(StrUtil.isNotBlank(tenantCode), "tenant_code", tenantCode)
-                .eq("state", Const.BooleanEnum.TRUE.value())
-                // .eq("consume_state", Const.BooleanEnum.FALSE.value())
+                .eq("state", Const.BooleanEnum.TRUE.getCode())
+                // .eq("consume_state", Const.BooleanEnum.FALSE.getCode())
                 .orderByDesc("create_time")
                 .last(Const.LIMIT_ONE)
                 .one();
@@ -108,8 +108,8 @@ public class MsgService implements BaseMsgService {
                 .eq("tpl_code", tplCode)
                 .eq("mail_to", mailTo)
                 .eq(StrUtil.isNotBlank(tenantCode), "tenant_code", tenantCode)
-                .eq("state", Const.BooleanEnum.TRUE.value())
-                .eq("consume_state", Const.BooleanEnum.FALSE.value())
+                .eq("state", Const.BooleanEnum.TRUE.getCode())
+                .eq("consume_state", Const.BooleanEnum.FALSE.getCode())
                 .eq(StrUtil.format(Const.SQL_JSON_KEY, "content_params", msgTpl.getParams().getStr("codeKey", "code")), mailCode)
                 .orderByDesc("create_time")
                 .last(Const.LIMIT_ONE)
@@ -137,10 +137,10 @@ public class MsgService implements BaseMsgService {
             // 先校验该收件人是否timeLimit秒内发送过
             MsgLogBody lastMailLog = getLatestByTplCode(sendForm.getTenantCode(), sendForm.getTplCode(), sendForm.getMailTo());
             // 检查限定时间内是否已经发送
-            AssertUtils.isTrue(null != lastMailLog && lastMailLog.getState() != MsgConst.MailSendStateEnum.FAIL.value() && DateUtil.between(DateUtil.date(), lastMailLog.getCreateTime(), DateUnit.SECOND) < timeLimit, ErrorCode.ERROR_REQUEST, "发送请求过于频繁,请稍后再试");
+            AssertUtils.isTrue(null != lastMailLog && lastMailLog.getState() != MsgConst.MailSendStateEnum.FAIL.getCode() && DateUtil.between(DateUtil.date(), lastMailLog.getCreateTime(), DateUnit.SECOND) < timeLimit, ErrorCode.ERROR_REQUEST, "发送请求过于频繁,请稍后再试");
         }
         // 判断是否验证码消息类型
-        if (mailTpl.getType() == MsgConst.MailTypeEnum.CODE.value()) {
+        if (mailTpl.getType() == MsgConst.MailTypeEnum.CODE.getCode()) {
             // 编码关键词
             JSONObject contentParams = ObjUtil.defaultIfNull(sendForm.getContentParams(), new JSONObject());
             contentParams.set(tplParams.getStr("codeKey", "code"), RandomUtil.randomString(tplParams.getStr("codeBaseString", RandomUtil.BASE_NUMBER), tplParams.getInt("codeLength", 4)));

@@ -1,6 +1,5 @@
 package com.nb6868.onex.msg.controller;
 
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.nb6868.onex.common.annotation.LogOperation;
 import com.nb6868.onex.common.annotation.QueryDataScope;
 import com.nb6868.onex.common.exception.ErrorCode;
@@ -10,14 +9,15 @@ import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.IdsReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.msg.dto.MsgLogQueryReq;
 import com.nb6868.onex.msg.dto.MsgTplDTO;
 import com.nb6868.onex.msg.dto.MsgTplQueryReq;
+import com.nb6868.onex.msg.dto.MsgTplSaveOrUpdateReq;
+import com.nb6868.onex.msg.entity.MsgTplEntity;
 import com.nb6868.onex.msg.service.MsgLogService;
 import com.nb6868.onex.msg.service.MsgService;
 import com.nb6868.onex.msg.service.MsgTplService;
@@ -70,29 +70,20 @@ public class MsgController {
     @Operation(summary = "模板详情")
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:query"}, logical = Logical.OR)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<MsgTplDTO> info(@Validated @RequestBody IdReq form) {
         MsgTplDTO data = msgTplService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<MsgTplDTO>().success(data);
     }
 
-    @PostMapping("tplSave")
-    @Operation(summary = "模板保存")
-    @LogOperation("模板保存")
+    @PostMapping("tplSaveOrUpdate")
+    @Operation(summary = "模板新增或保存")
+    @LogOperation("模板新增或保存")
     @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:edit"}, logical = Logical.OR)
-    public Result<?> tplSave(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody MsgTplDTO dto) {
-        msgTplService.saveDto(dto);
-
-        return new Result<>().success(dto);
-    }
-
-    @PostMapping("tplUpdate")
-    @Operation(summary = "模板修改")
-    @LogOperation("模板修改")
-    @RequiresPermissions(value = {"admin:super", "admin:msg", "sys:msgTpl:edit"}, logical = Logical.OR)
-    public Result<?> tplUpdate(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody MsgTplDTO dto) {
-        msgTplService.updateDto(dto);
+    public Result<?> tplSaveOrUpdate(@Validated @RequestBody MsgTplSaveOrUpdateReq req) {
+        MsgTplEntity entity = msgTplService.saveOrUpdateByReq(req);
+        MsgTplDTO dto = ConvertUtils.sourceToTarget(entity, MsgTplDTO.class);
 
         return new Result<>().success(dto);
     }

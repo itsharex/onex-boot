@@ -62,11 +62,11 @@ public class PostController {
     @Operation(summary = "信息")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:query"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<PostDTO> info(@Validated @RequestBody IdReq form) {
         PostDTO data = postService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<PostDTO>().success(data);
     }
 
     @PostMapping("save")

@@ -56,9 +56,9 @@ public class SmsAliyunMailService extends AbstractMailService {
         mailLog.setMailFrom("sms_aliyun");
         mailLog.setMailTo(request.getMailTo());
         mailLog.setContentParams(request.getContentParams());
-        mailLog.setConsumeState(Const.BooleanEnum.FALSE.value());
+        mailLog.setConsumeState(Const.BooleanEnum.FALSE.getCode());
         mailLog.setContent(StrUtil.format(mailTpl.getContent(), request.getContentParams(), true));
-        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.value());
+        mailLog.setState(MsgConst.MailSendStateEnum.SENDING.getCode());
         // 设置有效时间
         int validTimeLimit = mailTpl.getParams().getInt("validTimeLimit", 0);
         mailLog.setValidEndTime(validTimeLimit <= 0 ? DateUtil.offsetMonth(DateUtil.date(), 99 * 12) : DateUtil.offsetSecond(DateUtil.date(), validTimeLimit));
@@ -96,15 +96,15 @@ public class SmsAliyunMailService extends AbstractMailService {
             String result = HttpUtil.get(url);
             JSONObject resultJson = JSONUtil.parseObj(result);
             mailLog.setResult(result);
-            mailLog.setState("OK".equalsIgnoreCase(resultJson.getStr("Code")) ? MsgConst.MailSendStateEnum.SUCCESS.value() : MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState("OK".equalsIgnoreCase(resultJson.getStr("Code")) ? MsgConst.MailSendStateEnum.SUCCESS.getCode() : MsgConst.MailSendStateEnum.FAIL.getCode());
         } catch (Exception e) {
             // 接口调用失败
             log.error("AliyunSms", e);
-            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.value());
+            mailLog.setState(MsgConst.MailSendStateEnum.FAIL.getCode());
             mailLog.setResult(e.getMessage());
         }
         mailLogService.updateById(mailLog);
-        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.value();
+        return mailLog.getState() == MsgConst.MailSendStateEnum.SUCCESS.getCode();
     }
 
 }

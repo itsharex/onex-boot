@@ -1,21 +1,26 @@
 package com.nb6868.onex.uc.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.nb6868.onex.common.Const;
+import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.params.BaseParamsService;
 import com.nb6868.onex.common.params.ParamsProps;
-import com.nb6868.onex.common.Const;
 import com.nb6868.onex.common.util.JacksonUtils;
+import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dao.ParamsDao;
 import com.nb6868.onex.uc.dto.ParamsDTO;
+import com.nb6868.onex.uc.dto.ParamsSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.ParamsEntity;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 租户参数
@@ -52,17 +57,17 @@ public class ParamsService extends DtoService<ParamsDao, ParamsEntity, ParamsDTO
 
     @Override
     public String getSystemContent(String code) {
-        return getContent(UcConst.ParamsTypeEnum.SYSTEM.value(), null, null, code, null, null);
+        return getContent(UcConst.ParamsTypeEnum.SYSTEM.getCode(), null, null, code, null, null);
     }
 
     @Override
     public String getUserContent(Long userId, String code) {
-        return getContent(UcConst.ParamsTypeEnum.USER.value(), null, userId, code, null, null);
+        return getContent(UcConst.ParamsTypeEnum.USER.getCode(), null, userId, code, null, null);
     }
 
     @Override
     public String getTenantContent(String tenantCode, String code) {
-        return getContent(UcConst.ParamsTypeEnum.TENANT.value(), tenantCode, null, code, null, null);
+        return getContent(UcConst.ParamsTypeEnum.TENANT.getCode(), tenantCode, null, code, null, null);
     }
 
     @Override
@@ -117,17 +122,17 @@ public class ParamsService extends DtoService<ParamsDao, ParamsEntity, ParamsDTO
 
     @Override
     public <T> T getSystemContentObject(String code, Class<T> clazz, T defObj) {
-        return getContentObject(UcConst.ParamsTypeEnum.SYSTEM.value(), null, null, code, null, null, clazz, defObj);
+        return getContentObject(UcConst.ParamsTypeEnum.SYSTEM.getCode(), null, null, code, null, null, clazz, defObj);
     }
 
     @Override
     public <T> T getUserContentObject(Long userId, String code, Class<T> clazz, T defObj) {
-        return getContentObject(UcConst.ParamsTypeEnum.USER.value(), null, userId, code, null, null, clazz, defObj);
+        return getContentObject(UcConst.ParamsTypeEnum.USER.getCode(), null, userId, code, null, null, clazz, defObj);
     }
 
     @Override
     public <T> T getTenantContentObject(String tenantCode, String code, Class<T> clazz, T defObj) {
-        return getContentObject(UcConst.ParamsTypeEnum.TENANT.value(), tenantCode, null, code, null, null, clazz, defObj);
+        return getContentObject(UcConst.ParamsTypeEnum.TENANT.getCode(), tenantCode, null, code, null, null, clazz, defObj);
     }
 
     @Override
@@ -142,69 +147,49 @@ public class ParamsService extends DtoService<ParamsDao, ParamsEntity, ParamsDTO
     }
 
     /**
-     * 新增或者更新数据,通过code来判断
+     * 新增或修改
      */
-    public ParamsEntity saveOrUpdateUserParams(String code, String content, String scope, Long userId) {
-        ParamsEntity params = lambdaQuery().eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.USER.value())
-                .eq(ParamsEntity::getCode, code)
-                .eq(ParamsEntity::getUserId, userId)
-                .last(Const.LIMIT_ONE)
-                .one();
-        if (params != null) {
-            params.setContent(content);
-            params.setScope(scope);
-            updateById(params);
-        } else {
-            params = new ParamsEntity();
-            params.setContent(content);
-            params.setScope(scope);
-            params.setType(UcConst.ParamsTypeEnum.USER.value());
-            params.setUserId(userId);
-            params.setCode(code);
-            save(params);
+    @Transactional(rollbackFor = Exception.class)
+    public ParamsEntity saveOrUpdateByReq(ParamsSaveOrUpdateReq req) {
+        // 检查请求
+        AssertUtils.isTrue(req.getType().equals(UcConst.ParamsTypeEnum.USER.getCode()) && ObjectUtil.isNull(req.getUserId()), "用户参数需指定用户ID");
+        AssertUtils.isTrue(req.getType().equals(UcConst.ParamsTypeEnum.TENANT.getCode()) && ObjectUtil.isNull(req.getTenantCode()), "租户参数需指定租户编码");
+        // todo 检查用户租户是否存在
+        if (req.getType().equals(UcConst.ParamsTypeEnum.SYSTEM.getCode())) {
+            AssertUtils.isTrue(lambdaQuery()
+                    .ne(req.hasId(), ParamsEntity::getId, req.getId())
+                    .eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.SYSTEM.getCode())
+                    .eq(ParamsEntity::getCode, req.getCode())
+                    .exists(), "编号不能重复");
+        } else if (req.getType().equals(UcConst.ParamsTypeEnum.TENANT.getCode())) {
+            AssertUtils.isTrue(lambdaQuery()
+                    .ne(req.hasId(), ParamsEntity::getId, req.getId())
+                    .eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.TENANT.getCode())
+                    .eq(ParamsEntity::getCode, req.getCode())
+                    .eq(ParamsEntity::getTenantCode, req.getTenantCode())
+                    .exists(), "编号不能重复");
+        } else if (req.getType().equals(UcConst.ParamsTypeEnum.USER.getCode())) {
+            AssertUtils.isTrue(lambdaQuery()
+                    .ne(req.hasId(), ParamsEntity::getId, req.getId())
+                    .eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.USER.getCode())
+                    .eq(ParamsEntity::getCode, req.getCode())
+                    .eq(ParamsEntity::getUserId, req.getUserId())
+                    .exists(), "编号不能重复");
         }
-        return params;
-    }
-
-    /**
-     * 新增或者更新数据,通过code来判断
-     */
-    public ParamsEntity saveOrUpdateSystemParams(String code, String content, String scope) {
-        ParamsEntity params = lambdaQuery().eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.SYSTEM.value()).eq(ParamsEntity::getCode, code).last(Const.LIMIT_ONE).one();
-        if (params != null) {
-            params.setContent(content);
-            params.setScope(scope);
-            updateById(params);
+        // 转换数据格式
+        ParamsEntity entity;
+        if (req.hasId()) {
+            // 编辑数据
+            entity = getById(req.getId());
+            AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+            BeanUtil.copyProperties(req, entity);
         } else {
-            params = new ParamsEntity();
-            params.setContent(content);
-            params.setScope(scope);
-            params.setType(UcConst.ParamsTypeEnum.SYSTEM.value());
-            params.setCode(code);
-            save(params);
+            // 新增数据
+            entity = BeanUtil.copyProperties(req, ParamsEntity.class);
         }
-        return params;
-    }
-
-    /**
-     * 新增或者更新数据,通过code来判断
-     */
-    public ParamsEntity saveOrUpdateTenantParams(String code, String content, String scope, String tenantCode) {
-        ParamsEntity params = lambdaQuery().eq(ParamsEntity::getType, UcConst.ParamsTypeEnum.TENANT.value()).eq(ParamsEntity::getTenantCode, tenantCode).eq(ParamsEntity::getCode, code).last(Const.LIMIT_ONE).one();
-        if (params != null) {
-            params.setContent(content);
-            params.setScope(scope);
-            updateById(params);
-        } else {
-            params = new ParamsEntity();
-            params.setContent(content);
-            params.setScope(scope);
-            params.setTenantCode(tenantCode);
-            params.setType(UcConst.ParamsTypeEnum.TENANT.value());
-            params.setCode(code);
-            save(params);
-        }
-        return params;
+        // 处理数据
+        saveOrUpdateById(entity);
+        return entity;
     }
 
 }

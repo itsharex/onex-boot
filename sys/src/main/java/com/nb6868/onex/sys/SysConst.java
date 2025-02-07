@@ -1,5 +1,11 @@
 package com.nb6868.onex.sys;
 
+import cn.hutool.core.util.ObjUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.stream.Stream;
+
 /**
  * 系统模块常量
  *
@@ -12,6 +18,8 @@ public interface SysConst {
     /**
      * 日志类型
      */
+    @Getter
+    @AllArgsConstructor
     enum LogTypeEnum {
 
         /**
@@ -21,24 +29,23 @@ public interface SysConst {
         OPERATION("operation", "操作"),
         ERROR("error", "错误");
 
-        private String value;
-        private String name;
+        private String code;
+        private String title;
 
-        LogTypeEnum(String value) {
-            this.value = value;
+        public static LogTypeEnum findByCode(String codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
-        LogTypeEnum(String value, String name) {
-            this.value = value;
-            this.name = name;
+        public static String getTitleByCode(String codeValue) {
+            LogTypeEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
         }
 
-        public String value() {
-            return this.value;
-        }
-
-        public String getName() {
-            return this.name;
+        public static boolean isValid(String codeValue) {
+            return findByCode(codeValue) != null;
         }
     }
 
@@ -47,6 +54,8 @@ public interface SysConst {
      * 日历类型
      * 0工作日/1周末/2节日/3调休
      */
+    @Getter
+    @AllArgsConstructor
     enum CalenderTypeEnum {
 
         /**
@@ -57,25 +66,25 @@ public interface SysConst {
         HOLIDAY(2, "节日"),
         HOLIDAY_EXCHANGE(3, "调休");
 
-        private int value;
-        private String name;
+        private int code;
+        private String title;
 
-        CalenderTypeEnum(int value) {
-            this.value = value;
+        public static CalenderTypeEnum findByCode(Integer codeValue) {
+            return Stream.of(values())
+                    .filter(p -> ObjUtil.equal(codeValue, p.getCode()))
+                    .findFirst()
+                    .orElse(null);
         }
 
-        CalenderTypeEnum(int value, String name) {
-            this.value = value;
-            this.name = name;
+        public static String getTitleByCode(Integer codeValue) {
+            CalenderTypeEnum r = findByCode(codeValue);
+            return ObjUtil.isNull(r) ? "未定义" + codeValue : r.getTitle();
         }
 
-        public int value() {
-            return this.value;
+        public static boolean isValid(Integer codeValue) {
+            return findByCode(codeValue) != null;
         }
 
-        public String getName() {
-            return this.name;
-        }
     }
 
 }

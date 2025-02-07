@@ -59,11 +59,11 @@ public class BillController {
     @PostMapping("info")
     @Operation(summary = "信息")
     @RequiresPermissions("uc:bill:info")
-    public Result<?> info(@Validated @RequestBody IdReq form) {
+    public Result<BillDTO> info(@Validated @RequestBody IdReq form) {
         BillDTO data = billService.oneDto(QueryWrapperHelper.getPredicate(form));
         AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
 
-        return new Result<>().success(data);
+        return new Result<BillDTO>().success(data);
     }
 
     @PostMapping("save")
