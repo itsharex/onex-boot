@@ -29,7 +29,7 @@ public abstract class BaseJobConfig implements SchedulingConfigurer {
             JobEntity job = jobService.getById(jobId);
             if (job == null) {
                 log.error("job run Id=[{}], not found", jobId);
-            } else if (job.getState() != JobConst.JobStateEnum.NORMAL.getValue()) {
+            } else if (job.getState() != JobConst.JobStateEnum.NORMAL.getCode()) {
                 log.error("job run Id=[{}], state=[{}] abnormal", jobId, job.getState());
             } else {
                 log.info("job run Id=[{}], go start", jobId);

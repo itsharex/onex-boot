@@ -85,7 +85,7 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
         // 任务计时器
         TimeInterval timer = DateUtil.timer();
         // 记录初始化日志
-        Long jobLogId = jobLogService.saveLog(job, 0L, JobConst.JobLogStateEnum.INIT.getValue(), null);
+        Long jobLogId = jobLogService.saveLog(job, 0L, JobConst.JobLogStateEnum.INIT.getCode(), null);
         // 通过bean获取实现Service
         JobRunResult runResult;
         AbstractJobRunService jobRunService;
@@ -99,7 +99,7 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
             if (jobLogId > 0) {
                 jobLogService.update().set("error", ExceptionUtil.stacktraceToString(e))
                         .set("time_interval", timer.interval())
-                        .set("state", JobConst.JobLogStateEnum.ERROR.getValue())
+                        .set("state", JobConst.JobLogStateEnum.ERROR.getCode())
                         .eq("id", jobLogId)
                         .update(new JobLogEntity());
             }
@@ -108,12 +108,12 @@ public class JobService extends DtoService<JobDao, JobEntity, JobDTO> {
         if (jobLogId == 0 && runResult.getLogToDb()) {
             // 执行结果要求存入数据库
             job.setLogType("db");
-            jobLogService.saveLog(job, timer.interval(), JobConst.JobLogStateEnum.COMPLETED.getValue(), runResult.getResult().toString());
+            jobLogService.saveLog(job, timer.interval(), JobConst.JobLogStateEnum.COMPLETED.getCode(), runResult.getResult().toString());
         } else if (jobLogId > 0) {
             jobLogService.update()
                     .set("result", runResult.getResult().toString())
                     .set("time_interval", timer.interval())
-                    .set("state", JobConst.JobLogStateEnum.COMPLETED.getValue())
+                    .set("state", JobConst.JobLogStateEnum.COMPLETED.getCode())
                     .eq("id", jobLogId)
                     .update(new JobLogEntity());
         }
