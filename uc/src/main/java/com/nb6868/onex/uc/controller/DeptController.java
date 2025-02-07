@@ -12,14 +12,13 @@ import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.util.TreeNodeUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.DeptDTO;
 import com.nb6868.onex.uc.dto.DeptQueryReq;
+import com.nb6868.onex.uc.dto.DeptSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.DeptEntity;
 import com.nb6868.onex.uc.service.DeptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +27,10 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -39,7 +41,7 @@ import java.util.List;
 public class DeptController {
 
     @Autowired
-    private DeptService deptService;
+    DeptService deptService;
 
     @PostMapping("tree")
     @Operation(summary = "树表")
@@ -81,23 +83,13 @@ public class DeptController {
         return new Result<DeptDTO>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:edit"}, logical = Logical.OR)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody DeptDTO dto) {
-        deptService.saveDto(dto);
-
-        return new Result<>().success(dto);
-    }
-
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody DeptDTO dto) {
-        deptService.updateDto(dto);
-
+    public Result<?> saveOrUpdate(@Validated @RequestBody DeptSaveOrUpdateReq req) {
+        DeptEntity entity = deptService.saveOrUpdateByReq(req);
+        DeptDTO dto = ConvertUtils.sourceToTarget(entity, DeptDTO.class);
         return new Result<>().success(dto);
     }
 
@@ -106,8 +98,11 @@ public class DeptController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:dept:delete"}, logical = Logical.OR)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
-        deptService.remove(QueryWrapperHelper.getPredicate(req));
-
+        // 判断数据是否存在
+        AssertUtils.isFalse(deptService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
+        // 删除数据
+        deptService.removeById(req.getId());
+        // todo 级联删除子部门
         return new Result<>();
     }
 

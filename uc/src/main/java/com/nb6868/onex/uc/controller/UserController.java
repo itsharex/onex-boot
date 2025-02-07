@@ -164,7 +164,6 @@ public class UserController {
         AssertUtils.isTrue(Objects.equals(ShiroUtils.getUserId(), data.getId()), "无法删除当前登录用户");
         // 删除
         userService.deleteAllByIds(Collections.singletonList(data.getId()));
-
         return new Result<>();
     }
 

@@ -14,7 +14,6 @@ import com.nb6868.onex.common.validator.group.PageGroup;
 import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.PostDTO;
 import com.nb6868.onex.uc.dto.PostQueryReq;
-import com.nb6868.onex.uc.entity.PostEntity;
 import com.nb6868.onex.uc.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,10 +93,11 @@ public class PostController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:post:delete"}, logical = Logical.OR)
     @QueryDataScope(tenantFilter = true, tenantValidate = false)
-    public Result<?> delete(@Validated @RequestBody IdReq form) {
+    public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在
-        PostEntity data = postService.getOne(QueryWrapperHelper.getPredicate(form));
-        AssertUtils.isNull(data, ErrorCode.DB_RECORD_NOT_EXISTED);
+        AssertUtils.isFalse(postService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
+        // 删除数据
+        postService.removeById(req.getId());
         // todo 删除关联用户
         return new Result<>();
     }

@@ -107,7 +107,8 @@ public class RegionController {
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在
         AssertUtils.isFalse(regionService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
-        regionService.remove(QueryWrapperHelper.getPredicate(req));
+        // 删除数据
+        regionService.removeById(req.getId());
         // 删除子数据
         regionService.remove(regionService.lambdaQuery().likeRight(RegionEntity::getId, req.getId()).getWrapper());
         return new Result<>();

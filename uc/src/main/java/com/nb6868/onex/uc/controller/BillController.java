@@ -91,8 +91,10 @@ public class BillController {
     @LogOperation("删除")
     @RequiresPermissions("uc:bill:delete")
     public Result<?> delete(@Validated @RequestBody IdReq req) {
-        billService.remove(QueryWrapperHelper.getPredicate(req));
-
+        // 判断数据是否存在
+        AssertUtils.isFalse(billService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
+        // 删除数据
+        billService.removeById(req.getId());
         return new Result<>();
     }
 

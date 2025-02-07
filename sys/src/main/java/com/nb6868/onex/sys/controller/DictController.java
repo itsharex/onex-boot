@@ -82,8 +82,8 @@ public class DictController {
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在
         AssertUtils.isFalse(dictService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
-        dictService.remove(QueryWrapperHelper.getPredicate(req));
-
+        // 删除数据
+        dictService.removeById(req.getId());
         return new Result<>();
     }
 
@@ -92,7 +92,8 @@ public class DictController {
     @LogOperation("批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:sys", "admin:dict", "sys:dict:delete"}, logical = Logical.OR)
     public Result<?> deleteBatch(@Validated @RequestBody IdsReq req) {
-        dictService.remove(QueryWrapperHelper.getPredicate(req));
+        // 删除数据
+        dictService.removeByIds(req.getIds());
         return new Result<>();
     }
 

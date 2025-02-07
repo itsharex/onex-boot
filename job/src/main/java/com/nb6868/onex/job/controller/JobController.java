@@ -79,7 +79,7 @@ public class JobController {
         // 判断数据是否存在
         AssertUtils.isFalse(jobService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
         // 删除数据
-        jobService.remove(QueryWrapperHelper.getPredicate(req));
+        jobService.removeById(req.getId());
         return new Result<>();
     }
 
@@ -119,7 +119,7 @@ public class JobController {
     @LogOperation("日志批量删除")
     @RequiresPermissions(value = {"admin:super", "admin:job", "sys:jobLog:delete"}, logical = Logical.OR)
     public Result<?> logDeleteBatch(@Validated @RequestBody IdsReq req) {
-        jobLogService.remove(QueryWrapperHelper.getPredicate(req));
+        jobLogService.removeByIds(req.getIds());
 
         return new Result<>();
     }

@@ -1,18 +1,26 @@
 package com.nb6868.onex.uc.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.nb6868.onex.common.exception.ErrorCode;
 import com.nb6868.onex.common.jpa.DtoService;
 import com.nb6868.onex.common.shiro.ShiroUser;
 import com.nb6868.onex.common.shiro.ShiroUtils;
 import com.nb6868.onex.common.util.ConvertUtils;
+import com.nb6868.onex.common.validator.AssertUtils;
 import com.nb6868.onex.uc.UcConst;
 import com.nb6868.onex.uc.dao.DeptDao;
 import com.nb6868.onex.uc.dto.DeptDTO;
+import com.nb6868.onex.uc.dto.DeptSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.DeptEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 部门管理
@@ -24,6 +32,28 @@ public class DeptService extends DtoService<DeptDao, DeptEntity, DeptDTO> {
 
 	@Autowired
 	UserService userService;
+
+	/**
+	 * 新增或修改
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public DeptEntity saveOrUpdateByReq(DeptSaveOrUpdateReq req) {
+		// 检查请求
+		// 转换数据格式
+		DeptEntity entity;
+		if (req.hasId()) {
+			// 编辑数据
+			entity = getById(req.getId());
+			AssertUtils.isNull(entity, ErrorCode.DB_RECORD_NOT_EXISTED);
+			BeanUtil.copyProperties(req, entity);
+		} else {
+			// 新增数据
+			entity = BeanUtil.copyProperties(req, DeptEntity.class);
+		}
+		// 处理数据
+		saveOrUpdateById(entity);
+		return entity;
+	}
 
 	public DeptDTO getDtoByCode(String code) {
 		//超级管理员，部门ID为null

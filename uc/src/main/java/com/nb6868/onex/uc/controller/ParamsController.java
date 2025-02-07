@@ -105,8 +105,8 @@ public class ParamsController {
     public Result<?> delete(@Validated @RequestBody IdReq req) {
         // 判断数据是否存在
         AssertUtils.isFalse(paramsService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
-        // 数据删除
-        paramsService.removeById(req.getId(), false);
+        // 删除数据
+        paramsService.removeById(req.getId());
         return new Result<>();
     }
 

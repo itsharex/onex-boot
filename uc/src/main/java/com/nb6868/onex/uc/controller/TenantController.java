@@ -7,13 +7,12 @@ import com.nb6868.onex.common.jpa.QueryWrapperHelper;
 import com.nb6868.onex.common.pojo.IdReq;
 import com.nb6868.onex.common.pojo.PageData;
 import com.nb6868.onex.common.pojo.Result;
+import com.nb6868.onex.common.util.ConvertUtils;
 import com.nb6868.onex.common.validator.AssertUtils;
-import com.nb6868.onex.common.validator.group.AddGroup;
-import com.nb6868.onex.common.validator.group.DefaultGroup;
 import com.nb6868.onex.common.validator.group.PageGroup;
-import com.nb6868.onex.common.validator.group.UpdateGroup;
 import com.nb6868.onex.uc.dto.TenantDTO;
 import com.nb6868.onex.uc.dto.TenantQueryReq;
+import com.nb6868.onex.uc.dto.TenantSaveOrUpdateReq;
 import com.nb6868.onex.uc.entity.TenantEntity;
 import com.nb6868.onex.uc.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +33,9 @@ import java.util.List;
 @Validated
 @Tag(name = "租户管理")
 public class TenantController {
+
     @Autowired
-    private TenantService tenantService;
+    TenantService tenantService;
 
     @PostMapping("page")
     @Operation(summary = "分页")
@@ -67,22 +67,13 @@ public class TenantController {
         return new Result<TenantDTO>().success(data);
     }
 
-    @PostMapping("save")
-    @Operation(summary = "保存")
-    @LogOperation("保存")
+    @PostMapping("saveOrUpdate")
+    @Operation(summary = "新增或更新")
+    @LogOperation("新增或更新")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:edit"}, logical = Logical.OR)
-    public Result<?> save(@Validated(value = {DefaultGroup.class, AddGroup.class}) @RequestBody TenantDTO dto) {
-        tenantService.saveDto(dto);
-
-        return new Result<>().success(dto);
-    }
-
-    @PostMapping("update")
-    @Operation(summary = "修改")
-    @LogOperation("修改")
-    @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:edit"}, logical = Logical.OR)
-    public Result<?> update(@Validated(value = {DefaultGroup.class, UpdateGroup.class}) @RequestBody TenantDTO dto) {
-        tenantService.updateDto(dto);
+    public Result<?> saveOrUpdate(@Validated @RequestBody TenantSaveOrUpdateReq req) {
+        TenantEntity entity = tenantService.saveOrUpdateByReq(req);
+        TenantDTO dto = ConvertUtils.sourceToTarget(entity, TenantDTO.class);
 
         return new Result<>().success(dto);
     }
@@ -92,8 +83,11 @@ public class TenantController {
     @LogOperation("删除")
     @RequiresPermissions(value = {"admin:super", "admin:uc", "uc:tenant:delete"}, logical = Logical.OR)
     public Result<?> delete(@Validated @RequestBody IdReq req) {
-        tenantService.remove(QueryWrapperHelper.getPredicate(req));
-        // 按业务需求做其它操作
+        // 判断数据是否存在
+        AssertUtils.isFalse(tenantService.hasIdRecord(req.getId()), ErrorCode.DB_RECORD_NOT_EXISTED);
+        // 删除数据
+        tenantService.removeById(req.getId());
+        // todo 按业务需求做其它操作
         return new Result<>();
     }
 
