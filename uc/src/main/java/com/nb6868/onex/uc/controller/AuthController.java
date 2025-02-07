@@ -246,7 +246,7 @@ public class AuthController {
     @PostMapping("userLogout")
     @Operation(summary = "用户登出")
     @LogOperation(value = "用户登出", type = "logout")
-    public Result<?> userLogout() {
+    public Result<?> userLogout(@Validated @RequestBody BaseReq req) {
         String token = HttpContextUtils.getRequestParameter(authProps.getTokenHeaderKey());
         tokenService.deleteToken(token);
         return new Result<>();
@@ -254,7 +254,7 @@ public class AuthController {
 
     @PostMapping("userInfo")
     @Operation(summary = "用户信息")
-    public Result<?> userInfo() {
+    public Result<?> userInfo(@Validated @RequestBody BaseReq req) {
         UserEntity user = userService.getById(ShiroUtils.getUserId());
         AssertUtils.isNull(user, ErrorCode.ACCOUNT_NOT_EXIST);
 
@@ -368,7 +368,7 @@ public class AuthController {
 
     @PostMapping("userMenuTree")
     @Operation(summary = "用户菜单树", description = "用户左侧显示菜单")
-    public Result<?> userMenuTree() {
+    public Result<?> userMenuTree(@Validated @RequestBody BaseReq req) {
         ShiroUser user = ShiroUtils.getUser();
         List<TreeNode<Long>> menuList = new ArrayList<>();
         // 获取该用户所有menu, 菜单需要显示 && 菜单类型为菜单
@@ -385,7 +385,7 @@ public class AuthController {
 
     @PostMapping("userPermissions")
     @Operation(summary = "用户授权编码", description = "用户具备的权限,可用于按钮等的控制")
-    public Result<?> userPermissions() {
+    public Result<?> userPermissions(@Validated @RequestBody BaseReq req) {
         ShiroUser user = ShiroUtils.getUser();
         List<String> set = userService.getUserPermissions(user);
 
@@ -394,7 +394,7 @@ public class AuthController {
 
     @PostMapping("userRoleIds")
     @Operation(summary = "用户角色id", description = "用户具备的角色,可用于按钮等的控制")
-    public Result<?> userRoles() {
+    public Result<?> userRoles(@Validated @RequestBody BaseReq req) {
         ShiroUser user = ShiroUtils.getUser();
         List<Long> set = userService.getUserRoleIds(user);
 
@@ -403,7 +403,7 @@ public class AuthController {
 
     @PostMapping("userRoleCodes")
     @Operation(summary = "用户角色编码", description = "用户具备的角色,可用于按钮等的控制")
-    public Result<?> userRoleCodes() {
+    public Result<?> userRoleCodes(@Validated @RequestBody BaseReq req) {
         ShiroUser user = ShiroUtils.getUser();
         List<String> set = userService.getUserRoleCodes(user);
 
