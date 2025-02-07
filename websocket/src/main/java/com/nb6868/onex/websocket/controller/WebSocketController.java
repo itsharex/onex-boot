@@ -3,6 +3,7 @@ package com.nb6868.onex.websocket.controller;
 import com.nb6868.onex.common.pojo.BaseReq;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
+import com.nb6868.onex.websocket.dto.SidDTO;
 import com.nb6868.onex.websocket.dto.WebSocketSendReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ public class WebSocketController {
     @Operation(summary = "获得目前连接的Socket")
     @RequiresPermissions(value = {"admin:super", "admin:websocket", "sys:websocket:query"}, logical = Logical.OR)
     public Result<?> getOpenSockets(@Validated @RequestBody BaseReq req) {
-        List<String> sidList = webSocketServer.getSidList();
+        List<SidDTO> sidList = webSocketServer.getSidList();
         return new Result<>().success(sidList);
     }
 

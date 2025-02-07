@@ -1,6 +1,7 @@
 package com.nb6868.onex.websocket.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import com.nb6868.onex.websocket.dto.SidDTO;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
@@ -35,9 +36,13 @@ public class WebSocketServer {
     /**
      * 当前连接session id
      */
-    public List<String> getSidList() {
-        List<String> sidList = new ArrayList<>();
-        webSockets.forEach((sid, webSocketServer) -> sidList.add(sid));
+    public List<SidDTO> getSidList() {
+        List<SidDTO> sidList = new ArrayList<>();
+        webSockets.forEach((sid, webSocketServer) -> {
+            SidDTO dto = new SidDTO();
+            dto.setSid(sid);
+            sidList.add(dto);
+        });
         return sidList;
     }
 
