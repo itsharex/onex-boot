@@ -7,6 +7,7 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "onex.websocket.server", havingValue = "true")
 @ServerEndpoint("/ws/{sid}")
 public class WebSocketServer {
 

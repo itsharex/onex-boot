@@ -10,11 +10,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 整个类只作为测试客户端服务端通讯使用
+ * 实际使用，请按照业务场景调用对应的WebsocketServer
+ *
+ * @author Charles zhangchaoxu@gmail.com
+ */
+@ConditionalOnProperty(name = "onex.websocket.controller", havingValue = "true")
 @RestController("SysWebSocket")
 @RequestMapping("/sys/webSocket/")
 @Validated

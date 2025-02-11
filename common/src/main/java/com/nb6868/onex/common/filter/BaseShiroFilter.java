@@ -54,7 +54,6 @@ public abstract class BaseShiroFilter extends AuthenticatingFilter {
 
     /**
      * 登录失败
-     *
      * Realm.doGetAuthenticationInfo抛出的异常会在这里捕获处理
      */
     @Override
@@ -67,13 +66,12 @@ public abstract class BaseShiroFilter extends AuthenticatingFilter {
      * 响应未授权
      */
     @SneakyThrows
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecated")
     protected void responseUnauthorized(ServletRequest request, ServletResponse response, Exception e) {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         httpResponse.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         httpResponse.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ((HttpServletRequest) request).getHeader(HttpHeaders.ORIGIN));
-
         // 处理登录失败的异常
         Result<?> result = new Result<>().error(ErrorCode.UNAUTHORIZED);
         if (ObjUtil.isNotNull(e)) {
