@@ -1,6 +1,13 @@
-# 接口规范
+# 接口设计规范
 
-基本遵守类似Restful风格定义接口
+### 方法约束 
+接口规范从项目实践经验考虑，尽量避免Restful风格的代码(优劣不做展开讨论)。相关约束如下
+1. 禁止DELETE、PUT请求方法；
+2. 禁止使用路径参数PathVariable；
+3. 禁止同路径用不同方法做区分的接口，比如同为/uc/user路径接口，一个@GET用于获取数据，一个@POST用于提交数据是允许的；
+4. 接口强烈建议采用POST方法，个别对幂等接口(数据不会有修改)允许GET方法请求；
+5. POST方法请求的参数一律采用@RequestBody接收，也就是contentType=application/json，个别文件上传等接口除外；
+6. 接口即使是空参数的方法建议也加上BaseReq空请求，便于后续增加参数；
 
 ## 命名约束
 
@@ -11,12 +18,13 @@
 3. /model/entity/info 详情接口 传参实体主键,返回实体数据
 4. /model/entity/save 保存接口 传参不带主键实体,返回保存成功后的带有主键的实体数据
 5. /model/entity/update 更新接口 传参带主键实体,返回保存成功后的带有主键的实体数据
-6. /model/entity/changeState 修改状态接口
+6. /model/entity/saveOrUpdate 保存或者更新接口 传参带主键实体,返回保存成功后的带有主键的实体数据
+7. /model/entity/changeState 修改状态接口
 
 ## 方法约束
 
 请求方法限制Post和Get,所有数据操作(对数据有改动)接口一律Post,查询接口也尽量Post。  
-Post接口以@RequestBody(application/json)为主,尽量避免@RequetParam(form-data和x-www-form-urlencoded)形式的接口传递。
+Post接口以@RequestBody(=)为主,尽量避免@RequetParam(form-data和x-www-form-urlencoded)形式的接口传递。
 
 ## 安全认证约束
 

@@ -38,16 +38,6 @@ git clone https://github.com/zhangchaoxu/onex-api.git
 7. 项目集成了Swagger(knife4j),访问`http://127.0.0.1:18181/onex-boot-api/doc.html`即可访问和调试接口
 8. 上述接口中端口18080和路径onex-boot-api,在onex-boot\api\src\main\resources\application.yml中配置
 
-## 模块说明
-- common 基础模块，包含基础的注解、切片、过滤器、授权、工具类等
-- uc 用户中心(user center)模块，包含用户、角色、菜单权限，以及基于RBAC的权限控制，具体见[用户中心](boot/uc.md)
-- sys 系统模块，包含字典、日志、存储、区域等，具体见[系统模块](boot/sys.md)
-- msg 消息模块，包含消息模块和消息记录，消息指的是短信、钉钉通知等系统发送给用户的消息。具体见[消息](boot/msg.md)
-- job 定时任务模块，包含定时任务的配置和执行等操作。具体见[定时任务](boot/job.md)
-- tunnel 隧道模块，包含网络、数据库、系统信息等隧道穿透。具体见[隧道](boot/tunnel.md)
-- websocket Websocket模块，包含基于Websocket的客户端与服务器交互机制。具体见[隧道](boot/tunnel.md)
-- coder 代码生成器模块，包含通过前后端的代码生成工具。具体见[代码生成器](boot/coder.md)
-
 ### JAVA开发规范
-详见[阿里巴巴Java开发手册](https://github.com/alibaba/p3c)
+
 
