@@ -16,24 +16,8 @@
 * [v3] 支持SpringBoot2, 要求JAVA1.8+
 * 更多v3与v4之间区别见[v3升级v4](boot/v3_to_v4.md),更详细版本区别见[更新记录]((boot/CHANGELOG.md))
 
-## 演示地址
-* [管理后台](https://portal-onex.nb6868.com/)
-
-## 项目组成
-* [onex-boot](https://github.com/zhangchaoxu/onex-boot/)  OneX基础工程，包含了common、sys、uc等模块，引入依赖即可使用
-* [onex-api](https://github.com/zhangchaoxu/onex-api/)  基于onex-boot实现的一套接口，作为一个工程模板，可以直接fork创建工程
-* [onex-portal](https://github.com/zhangchaoxu/onex-portal) Vue2与ElementUI实现的管理页面
-
-## 功能模块
-### 已实现
-见左侧功能模块菜单
-
-## 待实现
-* [ ] 商城模块
-* [ ] 微信模块
-* [ ] 更加灵活的用户权限管理,目前RBAC0
-* [ ] 工作流引擎
-* [ ] 更加强大和使用的代码生成工具,不再支持批量生成,单表操作,可以勾选字段和类型
+## 使用方式
+见[Setup](boot/Setup.md)
 
 ## 图标logo
 * [登录背景生成网站](https://trianglify.io)
