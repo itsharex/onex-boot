@@ -36,6 +36,8 @@ public class SseEmitterService {
         SseEmitter sseEmitter = new SseEmitter(0L);
         // 注册回调
         sseEmitter.onCompletion(completionCallBack(sid));
+        sseEmitter.onError(errorCallBack(sid));
+        sseEmitter.onTimeout(timeoutCallBack(sid));
         sseCache.put(sid, sseEmitter);
         log.info("创建新的sse连接，当前id：{}", sid);
         try {
@@ -96,7 +98,7 @@ public class SseEmitterService {
             sseEmitter.send(sendData);
         } catch (IOException e) {
             // 推送消息失败，记录错误日志，进行重推
-            log.error("sendMsgToClient: 推送消息失败：{},尝试进行重推", msgBody.toString(), e);
+            log.error("sendMsgToClient: 推送消息失败：{},尝试进行重推", msgBody, e);
             boolean isSuccess = true;
             // 推送消息失败后，每隔10s推送一次，推送5次
             for (int i = 0; i < 5; i++) {
@@ -144,7 +146,6 @@ public class SseEmitterService {
     private Consumer<Throwable> errorCallBack(String sid) {
         return throwable -> {
             log.error("errorCallBack：连接异常,客户端ID:{}", sid);
-
             // 推送消息失败后，每隔10s推送一次，推送5次
             for (int i = 0; i < 5; i++) {
                 try {
@@ -156,7 +157,7 @@ public class SseEmitterService {
                     }
                     sseEmitter.send("失败后重新推送");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("errorCallBack: 错误回调，客户端ID:{}", sid, e);
                 }
             }
         };

@@ -1,7 +1,6 @@
 package com.nb6868.onex.common.sse;
 
 import cn.hutool.json.JSONUtil;
-import com.nb6868.onex.common.annotation.AccessControl;
 import com.nb6868.onex.common.pojo.Result;
 import com.nb6868.onex.common.validator.group.DefaultGroup;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,10 +19,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseController {
 
     @Autowired
-    private SseEmitterService sseEmitterService;
+    SseEmitterService sseEmitterService;
 
     @GetMapping("connect")
-    @AccessControl
     @Operation(summary = "创建连接")
     public SseEmitter connect(@RequestParam String sid) {
         return sseEmitterService.createSseConnect(sid);
